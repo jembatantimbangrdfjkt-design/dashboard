@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Monitoring Tonase Sampah & Produk RDF DKI Jakarta 3D</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Three.js for 3D Visualizations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- html2canvas for Dashboard Screenshot Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Smooth Theme Transitions & Clean Subtle Backgrounds */
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+        }
+
+        /* DARK THEME STYLES - Clean & Elegant Subtle 3D Depth */
+        body.dark {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        body.dark .glass-card-3d {
+            background: #1e293b;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark .glass-card-3d:hover {
+            border-color: #475569;
+            box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark .input-3d {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #ffffff;
+        }
+
+        body.dark .input-3d option {
+            background: #0f172a;
+            color: #ffffff;
+        }
+
+        /* LIGHT THEME STYLES - Clean & Crisp */
+        body.light {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        body.light .glass-card-3d {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 20px -5px rgba(148, 163, 184, 0.12), 0 4px 6px -2px rgba(148, 163, 184, 0.05);
+        }
+
+        body.light .glass-card-3d:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 12px 24px -5px rgba(148, 163, 184, 0.2);
+        }
+
+        body.light .input-3d {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+        }
+
+        body.light .input-3d option {
+            background: #ffffff;
+            color: #0f172a;
+        }
+
+        body.light .text-gray-400 { color: #64748b; }
+        body.light .text-gray-300 { color: #475569; }
+        body.light .text-white { color: #0f172a; }
+
+        /* Card & Button Styles */
+        .glass-card-3d {
+            border-radius: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #0d9488 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-3d-indigo {
+            background: #4f46e5;
+            transition: background-color 0.2s ease;
+        }
+        .btn-3d-indigo:hover {
+            background: #4338ca;
+        }
+
+        .btn-3d-emerald {
+            background: #059669;
+            transition: background-color 0.2s ease;
+        }
+        .btn-3d-emerald:hover {
+            background: #047857;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
+        .chart-3d-canvas {
+            width: 100% !important;
+            height: 100% !important;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body class="dark p-4 md:p-6 lg:p-8">
+    <div id="dashboardCaptureArea" class="w-full max-w-7xl mx-auto flex flex-col gap-6">
+        
+        <!-- Reconstructed Header Structure -->
+        <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 glass-card-3d p-6">
+            <div class="flex items-center gap-5 group">
+                <!-- Removed border, shadow, and fixed width so the logo can sit naturally without a box -->
+                <div class="relative h-14 md:h-16 cursor-pointer shrink-0 rounded-lg overflow-hidden" onclick="document.getElementById('logoInput').click()">
+                    <img id="appLogo" src="https://placehold.co/100x100/1e293b/4f46e5?text=DKI" alt="Logo" class="h-full w-auto object-contain">
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold text-center px-1">
+                        Ganti
+                    </div>
+                </div>
+                <input type="file" id="logoInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+                
+                <div>
+                    <!-- Removed gradient-text class to fix the black background block issue in html2canvas -->
+                    <h1 class="text-xl md:text-2xl font-black tracking-tight uppercase text-indigo-700 dark:text-indigo-400">
+                        Monthly Report
+                    </h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mt-1">
+                        RDF Plant DKI Jakarta
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Controls & Theme Switcher -->
+            <div class="flex flex-wrap items-center gap-3 no-export">
+                <button onclick="downloadDashboardImage()" id="btnDownloadDashboard" class="px-3.5 py-2 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-file-image"></i> Unduh Dashboard
+                </button>
+
+                <button onclick="toggleTheme()" class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-gray-200 border border-slate-700 transition flex items-center gap-2">
+                    <i id="themeIcon" class="fa-solid fa-sun text-amber-400"></i>
+                    <span id="themeLabel">Mode Terang</span>
+                </button>
+                
+                <button onclick="resetData()" class="px-3 py-2 text-xs font-semibold rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 border border-rose-900/50 transition flex items-center gap-2">
+                    <i class="fa-solid fa-trash-can"></i> Reset Data
+                </button>
+
+                <div class="px-3 py-2 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-semibold text-emerald-400 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    System Live
+                </div>
+            </div>
+        </header>
+
+        <!-- Date Range Filter Bar -->
+        <section class="w-full glass-card-3d p-4">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2 text-indigo-400 font-bold text-sm">
+                    <i class="fa-solid fa-calendar-days text-lg"></i>
+                    <span>PERIODE BULAN EVALUASI</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto no-export">
+                    <div class="flex items-center gap-2 text-xs text-gray-400 flex-1 md:flex-initial">
+                        <span>Dari:</span>
+                        <input type="month" id="filterStartMonth" onchange="applyDateFilter()" class="p-2 rounded-xl input-3d text-xs focus:outline-none w-full md:w-36">
+                    </div>
+
+                    <div class="flex items-center gap-2 text-xs text-gray-400 flex-1 md:flex-initial">
+                        <span>Sampai:</span>
+                        <input type="month" id="filterEndMonth" onchange="applyDateFilter()" class="p-2 rounded-xl input-3d text-xs focus:outline-none w-full md:w-36">
+                    </div>
+
+                    <button onclick="resetDateFilter()" class="px-3 py-2 rounded-xl bg-slate-700/60 hover:bg-slate-600 text-xs font-semibold text-gray-300 transition flex items-center gap-1">
+                        <i class="fa-solid fa-filter-circle-xmark"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <main class="w-full space-y-6">
+            <!-- Summary Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <!-- Card 1: Total Sampah Masuk -->
+                <div class="glass-card-3d p-5 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                    <div class="flex items-center justify-between text-gray-400 mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider">Total Sampah Masuk</span>
+                        <i class="fa-solid fa-truck-moving text-indigo-400 text-lg"></i>
+                    </div>
+                    <div class="text-3xl font-black tracking-tight mb-1" id="stat-total-sampah">0.00 <span class="text-sm font-normal text-gray-400">Ton</span></div>
+                    <div class="text-xs text-indigo-400 flex items-center gap-1 font-medium">
+                        <i class="fa-solid fa-city"></i> Sum All Sub-Districts
+                    </div>
+                </div>
+
+                <!-- Card 2: Total RDF Terkirim -->
+                <div class="glass-card-3d p-5 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl"></div>
+                    <div class="flex items-center justify-between text-gray-400 mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider">Total RDF Terkirim</span>
+                        <i class="fa-solid fa-boxes-packing text-cyan-400 text-lg"></i>
+                    </div>
+                    <div class="text-3xl font-black tracking-tight mb-1 text-cyan-400" id="stat-total-rdf">0.00 <span class="text-sm font-normal text-gray-400">Ton</span></div>
+                    <div class="text-xs text-cyan-400 flex items-center gap-1 font-medium">
+                        <i class="fa-solid fa-circle-check"></i> RDF Curah + Indocement
+                    </div>
+                </div>
+
+                <!-- Card 3: Total Residu -->
+                <div class="glass-card-3d p-5 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl"></div>
+                    <div class="flex items-center justify-between text-gray-400 mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider">Total Residu</span>
+                        <i class="fa-solid fa-dumpster text-amber-400 text-lg"></i>
+                    </div>
+                    <div class="text-3xl font-black tracking-tight mb-1 text-amber-400" id="stat-total-residu">0.00 <span class="text-sm font-normal text-gray-400">Ton</span></div>
+                    <div class="text-xs text-amber-400 flex items-center gap-1 font-medium">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Terpisah dari RDF
+                    </div>
+                </div>
+
+                <!-- Card 4: Total Produk Terolah -->
+                <div class="glass-card-3d p-5 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl"></div>
+                    <div class="flex items-center justify-between text-gray-400 mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider">Total Terolah</span>
+                        <i class="fa-solid fa-chart-line text-emerald-400 text-lg"></i>
+                    </div>
+                    <div class="text-3xl font-black text-emerald-400 tracking-tight mb-1" id="stat-total-terolah">0.00 <span class="text-sm font-normal text-gray-400">Ton</span></div>
+                    <div class="text-xs text-gray-400 font-medium" id="stat-rasio-terolah">
+                        Rasio Pengolahan: 0%
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2D Charts Viewports -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- 2D Bar Chart: Tonase Sampah Masuk per Wilayah -->
+                <div class="glass-card-3d p-6 lg:col-span-2 flex flex-col justify-between relative min-h-[380px]">
+                    <div class="flex justify-between items-center mb-2 z-10">
+                        <div>
+                            <h3 class="text-lg font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-chart-column text-indigo-400"></i> Sampah Masuk per Wilayah
+                            </h3>
+                            <p class="text-xs text-gray-400">Distribusi tonase sampah masuk beserta persentase kontribusi</p>
+                        </div>
+                        <span class="text-[10px] bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 px-2.5 py-1 rounded-full font-bold">2D CHART</span>
+                    </div>
+
+                    <!-- 2D Canvas Container -->
+                    <div class="relative w-full h-72 flex-1 rounded-xl overflow-hidden bg-slate-900/10 border border-gray-700/30">
+                        <canvas id="barChart2DCanvas" class="w-full h-full block"></canvas>
+                    </div>
+                </div>
+
+                <!-- 2D Donut Chart: Komposisi Produk Terolah -->
+                <div class="glass-card-3d p-6 flex flex-col justify-between relative min-h-[380px]">
+                    <div class="z-10">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3 class="text-lg font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-chart-pie text-cyan-400"></i> Komposisi Produk
+                            </h3>
+                            <span class="text-[10px] bg-cyan-950/80 text-cyan-300 border border-cyan-500/30 px-2.5 py-1 rounded-full font-bold">2D CHART</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2">Persentase RDF Curah, Indocement, & Residu</p>
+                    </div>
+
+                    <!-- 2D Donut Canvas Container -->
+                    <div class="relative w-full h-64 flex-1 rounded-xl overflow-hidden bg-slate-900/10 border border-gray-700/30 flex items-center justify-center">
+                        <canvas id="donutChart2DCanvas" class="w-full h-full block"></canvas>
+                    </div>
+
+                    <!-- Product Legend -->
+                    <div class="grid grid-cols-3 gap-2 text-center text-[10px] pt-3 font-semibold">
+                        <div class="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">RDF Curah</div>
+                        <div class="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400">Indocement</div>
+                        <div class="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400">Residu</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ringkasan Sampah Masuk per Wilayah & Kecamatan -->
+            <section class="space-y-4 pt-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-city text-indigo-400"></i> Ringkasan Tonase per Kecamatan
+                        </h2>
+                        <p class="text-xs text-gray-400">Total akumulasi otomatis terhitung berdasarkan data entry</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5" id="wilayah-cards-container">
+                    <!-- Dynamically generated Wilayah + Kecamatan list cards -->
+                </div>
+            </section>
+
+            <!-- Input Forms & Detailed Data Table -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4 no-export">
+                
+                <!-- MODULE 1 & 2: Input Forms Column -->
+                <div class="glass-card-3d p-6 lg:col-span-1 border-t-2 border-indigo-500 space-y-8">
+                    
+                    <!-- Form 1: Sampah Masuk per Kecamatan -->
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-truck-ramp-box text-indigo-400"></i> Input Sampah Masuk
+                            </h3>
+                            <span class="text-[10px] bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-bold">ENTRY DATA</span>
+                        </div>
+                        
+                        <form id="sampahForm" onsubmit="handleSampahFormSubmit(event)" class="space-y-3">
+                            <input type="hidden" id="editSampahId" value="">
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">BULAN</label>
+                                <input type="month" id="inputTanggalSampah" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Wilayah</label>
+                                <select id="selectWilayah" onchange="updateKecamatanDropdown()" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none">
+                                    <option value="Jakarta Utara">Jakarta Utara</option>
+                                    <option value="Jakarta Timur">Jakarta Timur</option>
+                                    <option value="Jakarta Pusat">Jakarta Pusat</option>
+                                    <option value="Jakarta Barat">Jakarta Barat</option>
+                                    <option value="Jakarta Selatan">Jakarta Selatan</option>
+                                    <option value="Kepulauan Seribu">Kepulauan Seribu</option>
+                                    <option value="UPST">UPST</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Kecamatan</label>
+                                <select id="selectKecamatan" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none">
+                                    <!-- Dynamic options -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Tonase (Ton)</label>
+                                <input type="number" step="0.01" min="0" id="inputTonaseMasuk" placeholder="0.00" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                            </div>
+
+                            <div class="flex gap-2 pt-1">
+                                <button type="submit" id="btnSubmitSampah" class="flex-1 py-2.5 px-4 rounded-xl btn-3d-indigo font-bold text-white text-xs tracking-wide flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-floppy-disk"></i> Simpan Tonase
+                                </button>
+                                <button type="button" onclick="cancelEditSampah()" id="btnCancelSampah" class="hidden px-3 py-2.5 rounded-xl bg-gray-700 text-gray-300 text-xs font-semibold hover:bg-gray-600 transition">
+                                    Batal
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Form 2: Input Hasil Pengolahan Produk -->
+                    <div class="pt-6 border-t border-gray-800">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-industry text-emerald-400"></i> Hasil Pengolahan
+                            </h3>
+                        </div>
+
+                        <form id="produkForm" onsubmit="handleProdukFormSubmit(event)" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Tanggal</label>
+                                <input type="date" id="inputTanggalProduk" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs text-gray-300 mb-1 flex items-center gap-1">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span> RDF Curah (Ton)
+                                </label>
+                                <input type="number" step="0.01" min="0" id="inputRdfCurah" placeholder="0.00" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs text-gray-300 mb-1 flex items-center gap-1">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span> Indocement (Ton)
+                                </label>
+                                <input type="number" step="0.01" min="0" id="inputIndocement" placeholder="0.00" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                            </div>
+
+                            <!-- Live Preview RDF Terkirim -->
+                            <div class="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-500/30 flex justify-between items-center text-xs">
+                                <span class="text-cyan-400 font-semibold">Total Terkirim:</span>
+                                <span class="text-sm font-extrabold text-cyan-300" id="previewTotalRdf">0.00 Ton</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs text-gray-300 mb-1 flex items-center gap-1">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Residu (Ton)
+                                </label>
+                                <input type="number" step="0.01" min="0" id="inputResidu" placeholder="0.00" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                            </div>
+
+                            <button type="submit" class="w-full py-2.5 px-4 rounded-xl btn-3d-emerald font-bold text-white text-xs tracking-wide flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-arrows-rotate"></i> Update Produk
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Data Table Column -->
+                <div class="glass-card-3d p-6 lg:col-span-2 flex flex-col justify-between border-t-2 border-indigo-500">
+                    <div>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold flex items-center gap-2">
+                                    <i class="fa-solid fa-table text-indigo-400"></i> Detail Log Tonase Masuk
+                                </h3>
+                                <p class="text-xs text-gray-400">Rincian entry tonase berdasarkan tanggal</p>
+                            </div>
+                            <div class="w-full sm:w-auto flex gap-2">
+                                <input type="text" id="searchTable" oninput="renderTable()" placeholder="Cari kecamatan/wilayah..." class="px-3 py-1.5 rounded-lg input-3d text-xs focus:outline-none w-full sm:w-48">
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-900/60 text-gray-400 uppercase border-b border-gray-800">
+                                        <th class="p-3">Tanggal</th>
+                                        <th class="p-3">Wilayah</th>
+                                        <th class="p-3">Kecamatan</th>
+                                        <th class="p-3 text-right">Tonase (T)</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataTableBody" class="divide-y divide-gray-800/60 font-medium">
+                                    <!-- Dynamic Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-gray-800 flex justify-between items-center text-xs text-gray-400">
+                        <span id="rowCount">Showing 0 entries</span>
+                        <span><i class="fa-solid fa-database text-indigo-400"></i> Disimpan di Local Browser</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirmation Modal Component -->
+    <div id="customModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="glass-card-3d p-6 max-w-sm w-full text-center space-y-4">
+            <div class="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white" id="modalTitle">Konfirmasi</h3>
+            <p class="text-xs text-gray-300" id="modalMessage">Apakah Anda yakin ingin melanjutkan?</p>
+            <div class="flex gap-3 pt-2">
+                <button id="modalBtnCancel" class="flex-1 py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-gray-300 text-xs font-bold transition">Batal</button>
+                <button id="modalBtnConfirm" class="flex-1 py-2 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition">Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Master definition of Regions and Sub-districts
+        const MASTER_WILAYAH = {
+            "Jakarta Utara": ["Cilincing", "Kelapa Gading", "Koja", "Tanjung Priok", "Pademangan", "Penjaringan"],
+            "Jakarta Timur": ["Cakung", "Pulogadung", "Duren Sawit", "Jatinegara", "Matraman", "Makasar"],
+            "Jakarta Pusat": ["Cempaka Putih", "Kemayoran", "Johar Baru", "Senen", "Gambir"],
+            "Jakarta Barat": ["Tambora", "Cengkareng", "Taman Sari"],
+            "Jakarta Selatan": ["Pasar Minggu"],
+            "Kepulauan Seribu": ["Kepulauan Seribu Direct"],
+            "UPST": ["UPST Direct"]
+        };
+
+        function getTodayString() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        // Default Sample Data
+        const DEFAULT_SAMPAH_MASUK = [
+            { id: "1", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Cilincing", tonaseMasuk: 280.5 },
+            { id: "2", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Kelapa Gading", tonaseMasuk: 195.0 },
+            { id: "3", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Koja", tonaseMasuk: 220.0 },
+            { id: "4", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Tanjung Priok", tonaseMasuk: 310.0 },
+            { id: "5", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Pademangan", tonaseMasuk: 155.0 },
+            { id: "6", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Penjaringan", tonaseMasuk: 260.0 },
+            { id: "7", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Cakung", tonaseMasuk: 340.0 },
+            { id: "8", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Pulogadung", tonaseMasuk: 240.0 },
+            { id: "9", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Duren Sawit", tonaseMasuk: 215.0 },
+            { id: "10", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Jatinegara", tonaseMasuk: 200.0 },
+            { id: "11", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Matraman", tonaseMasuk: 135.0 },
+            { id: "12", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Makasar", tonaseMasuk: 175.0 },
+            { id: "13", tanggal: getTodayString(), wilayah: "Jakarta Pusat", kecamatan: "Cempaka Putih", tonaseMasuk: 125.0 },
+            { id: "14", tanggal: getTodayString(), wilayah: "Jakarta Pusat", kecamatan: "Kemayoran", tonaseMasuk: 220.0 },
+            { id: "15", tanggal: getTodayString(), wilayah: "Jakarta Pusat", kecamatan: "Johar Baru", tonaseMasuk: 105.0 },
+            { id: "16", tanggal: getTodayString(), wilayah: "Jakarta Pusat", kecamatan: "Senen", tonaseMasuk: 165.0 },
+            { id: "17", tanggal: getTodayString(), wilayah: "Jakarta Pusat", kecamatan: "Gambir", tonaseMasuk: 145.0 },
+            { id: "18", tanggal: getTodayString(), wilayah: "Jakarta Barat", kecamatan: "Tambora", tonaseMasuk: 230.0 },
+            { id: "19", tanggal: getTodayString(), wilayah: "Jakarta Barat", kecamatan: "Cengkareng", tonaseMasuk: 320.0 },
+            { id: "20", tanggal: getTodayString(), wilayah: "Jakarta Barat", kecamatan: "Taman Sari", tonaseMasuk: 150.0 },
+            { id: "21", tanggal: getTodayString(), wilayah: "Jakarta Selatan", kecamatan: "Pasar Minggu", tonaseMasuk: 250.0 },
+            { id: "22", tanggal: getTodayString(), wilayah: "Kepulauan Seribu", kecamatan: "Kepulauan Seribu Direct", tonaseMasuk: 45.0 },
+            { id: "23", tanggal: getTodayString(), wilayah: "UPST", kecamatan: "UPST Direct", tonaseMasuk: 425.0 }
+        ];
+
+        const DEFAULT_PRODUK = [
+            { id: "p1", tanggal: getTodayString(), rdfCurah: 2450.0, indocement: 1820.0, residu: 410.0 }
+        ];
+
+        // Global State variables
+        let dataSampah = [];
+        let dataProduk = [];
+        let currentTheme = 'dark';
+        
+        // Define placeholders for 3D objects to prevent ReferenceErrors if called
+        window.bar3D = { scene: null, camera: null, renderer: null, bars: [], animationId: null };
+        window.donut3D = { scene: null, camera: null, renderer: null, meshGroup: null, animationId: null };
+
+        window.onload = function() {
+            document.getElementById('inputTanggalSampah').value = getTodayString();
+            document.getElementById('inputTanggalProduk').value = getTodayString();
+
+            loadSavedLogo();
+            loadData();
+            updateKecamatanDropdown();
+            setupProdukFormListeners();
+
+            refreshDashboard();
+
+            // Responsive Canvas listener
+            window.addEventListener('resize', refreshDashboard);
+        };
+
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const logoDataUrl = e.target.result;
+                    document.getElementById('appLogo').src = logoDataUrl;
+                    localStorage.setItem('rdf_jakarta_custom_logo', logoDataUrl);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function loadSavedLogo() {
+            const savedLogo = localStorage.getItem('rdf_jakarta_custom_logo');
+            if (savedLogo) {
+                document.getElementById('appLogo').src = savedLogo;
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeLabel = document.getElementById('themeLabel');
+
+            if (currentTheme === 'dark') {
+                currentTheme = 'light';
+                body.classList.remove('dark');
+                body.classList.add('light');
+                html.classList.remove('dark');
+                themeIcon.className = 'fa-solid fa-moon text-indigo-600';
+                themeLabel.textContent = 'Mode Gelap';
+            } else {
+                currentTheme = 'dark';
+                body.classList.remove('light');
+                body.classList.add('dark');
+                html.classList.add('dark');
+                themeIcon.className = 'fa-solid fa-sun text-amber-400';
+                themeLabel.textContent = 'Mode Terang';
+            }
+            refreshDashboard();
+        }
+
+        function loadData() {
+            const storedSampah = localStorage.getItem('rdf_jakarta_sampah_v3');
+            const storedProduk = localStorage.getItem('rdf_jakarta_produk_v3');
+
+            if (storedSampah) {
+                try { dataSampah = JSON.parse(storedSampah); } catch(e) { dataSampah = [...DEFAULT_SAMPAH_MASUK]; }
+            } else {
+                dataSampah = JSON.parse(JSON.stringify(DEFAULT_SAMPAH_MASUK));
+            }
+
+            if (storedProduk) {
+                try { dataProduk = JSON.parse(storedProduk); } catch(e) { dataProduk = [...DEFAULT_PRODUK]; }
+            } else {
+                dataProduk = JSON.parse(JSON.stringify(DEFAULT_PRODUK));
+            }
+
+            const todayProd = dataProduk.find(p => p.tanggal === getTodayString()) || dataProduk[0] || { rdfCurah: 0, indocement: 0, residu: 0 };
+            document.getElementById('inputRdfCurah').value = todayProd.rdfCurah;
+            document.getElementById('inputIndocement').value = todayProd.indocement;
+            document.getElementById('inputResidu').value = todayProd.residu;
+            updateRdfPreview();
+        }
+
+        function saveData() {
+            localStorage.setItem('rdf_jakarta_sampah_v3', JSON.stringify(dataSampah));
+            localStorage.setItem('rdf_jakarta_produk_v3', JSON.stringify(dataProduk));
+        }
+
+        function resetData() {
+            showModal(
+                "Hapus Semua Data",
+                "Apakah Anda yakin ingin menghapus seluruh data? Semua data tonase masuk dan produk akan dikosongkan (menjadi 0) secara permanen.",
+                function() {
+                    // Kosongkan array data
+                    dataSampah = [];
+                    dataProduk = [];
+                    
+                    // Reset input form produk ke 0/kosong
+                    document.getElementById('inputRdfCurah').value = '';
+                    document.getElementById('inputIndocement').value = '';
+                    document.getElementById('inputResidu').value = '';
+                    updateRdfPreview();
+                    
+                    // Simpan state kosong dan muat ulang dashboard
+                    saveData();
+                    loadData();
+                    resetDateFilter();
+                    refreshDashboard();
+                }
+            );
+        }
+
+        function showModal(title, message, onConfirm) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            const modal = document.getElementById('customModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const btnConfirm = document.getElementById('modalBtnConfirm');
+            const btnCancel = document.getElementById('modalBtnCancel');
+
+            const cleanup = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                btnConfirm.onclick = null;
+                btnCancel.onclick = null;
+            };
+
+            btnConfirm.onclick = () => { cleanup(); onConfirm(); };
+            btnCancel.onclick = () => { cleanup(); };
+        }
+
+        function updateKecamatanDropdown() {
+            const selectedWilayah = document.getElementById('selectWilayah').value;
+            const kecamatanSelect = document.getElementById('selectKecamatan');
+            kecamatanSelect.innerHTML = '';
+
+            const list = MASTER_WILAYAH[selectedWilayah] || [];
+            list.forEach(kec => {
+                const opt = document.createElement('option');
+                opt.value = kec;
+                opt.textContent = kec.endsWith("Direct") ? "Input Langsung " + selectedWilayah : kec;
+                kecamatanSelect.appendChild(opt);
+            });
+        }
+
+        function setupProdukFormListeners() {
+            ['inputRdfCurah', 'inputIndocement'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateRdfPreview);
+            });
+        }
+
+        function updateRdfPreview() {
+            const curah = parseFloat(document.getElementById('inputRdfCurah').value) || 0;
+            const indo = parseFloat(document.getElementById('inputIndocement').value) || 0;
+            const totalRdf = curah + indo;
+            document.getElementById('previewTotalRdf').textContent = `${totalRdf.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} Ton`;
+        }
+
+        function getFilteredData() {
+            const startMonth = document.getElementById('filterStartMonth').value;
+            const endMonth = document.getElementById('filterEndMonth').value;
+
+            const filteredSampah = dataSampah.filter(item => {
+                const itemMonth = item.tanggal.substring(0, 7); // Ambil format YYYY-MM
+                if (startMonth && itemMonth < startMonth) return false;
+                if (endMonth && itemMonth > endMonth) return false;
+                return true;
+            });
+
+            const filteredProduk = dataProduk.filter(item => {
+                const itemMonth = item.tanggal.substring(0, 7); // Ambil format YYYY-MM
+                if (startMonth && itemMonth < startMonth) return false;
+                if (endMonth && itemMonth > endMonth) return false;
+                return true;
+            });
+
+            return { filteredSampah, filteredProduk };
+        }
+
+        function applyDateFilter() {
+            refreshDashboard();
+        }
+
+        function resetDateFilter() {
+            document.getElementById('filterStartMonth').value = '';
+            document.getElementById('filterEndMonth').value = '';
+            refreshDashboard();
+        }
+
+        function calculateSummary() {
+            const { filteredSampah, filteredProduk } = getFilteredData();
+
+            const summaryByWilayah = {};
+            const summaryByKecamatan = {};
+
+            Object.keys(MASTER_WILAYAH).forEach(w => {
+                summaryByWilayah[w] = { tonaseMasuk: 0, count: 0 };
+                MASTER_WILAYAH[w].forEach(k => {
+                    summaryByKecamatan[k] = 0;
+                });
+            });
+
+            let grandTotalSampah = 0;
+            filteredSampah.forEach(item => {
+                const w = item.wilayah;
+                const k = item.kecamatan;
+                const tonase = item.tonaseMasuk || 0;
+
+                if (!summaryByWilayah[w]) summaryByWilayah[w] = { tonaseMasuk: 0, count: 0 };
+                summaryByWilayah[w].tonaseMasuk += tonase;
+                summaryByWilayah[w].count += 1;
+
+                if (summaryByKecamatan[k] === undefined) summaryByKecamatan[k] = 0;
+                summaryByKecamatan[k] += tonase;
+
+                grandTotalSampah += tonase;
+            });
+
+            let sumRdfCurah = 0, sumIndocement = 0, sumResidu = 0;
+            filteredProduk.forEach(p => {
+                sumRdfCurah += p.rdfCurah || 0;
+                sumIndocement += p.indocement || 0;
+                sumResidu += p.residu || 0;
+            });
+
+            const rdfTerkirim = sumRdfCurah + sumIndocement;
+            const totalTerolah = rdfTerkirim + sumResidu;
+            const rasioTerolah = grandTotalSampah > 0 ? ((totalTerolah / grandTotalSampah) * 100).toFixed(1) : 0;
+
+            return {
+                summaryByWilayah,
+                summaryByKecamatan,
+                grandTotalSampah,
+                sumRdfCurah,
+                sumIndocement,
+                sumResidu,
+                rdfTerkirim,
+                totalTerolah,
+                rasioTerolah
+            };
+        }
+
+        function refreshDashboard() {
+            const stats = calculateSummary();
+
+            document.getElementById('stat-total-sampah').innerHTML = `${stats.grandTotalSampah.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-sm font-normal text-gray-400">Ton</span>`;
+            document.getElementById('stat-total-rdf').innerHTML = `${stats.rdfTerkirim.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-sm font-normal text-gray-400">Ton</span>`;
+            document.getElementById('stat-total-residu').innerHTML = `${stats.sumResidu.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-sm font-normal text-gray-400">Ton</span>`;
+            document.getElementById('stat-total-terolah').innerHTML = `${stats.totalTerolah.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-sm font-normal text-gray-400">Ton</span>`;
+            document.getElementById('stat-rasio-terolah').innerHTML = `<i class="fa-solid fa-percent text-emerald-400"></i> Efisiensi Terolah: <span class="text-emerald-400 font-bold">${stats.rasioTerolah}%</span> dari Sampah Masuk`;
+
+            renderWilayahCards(stats.summaryByWilayah, stats.summaryByKecamatan, stats.grandTotalSampah);
+            renderTable();
+
+            drawBarChart2D(stats.summaryByWilayah, stats.grandTotalSampah);
+            drawDonutChart2D(stats.sumRdfCurah, stats.sumIndocement, stats.sumResidu, stats.totalTerolah);
+        }
+
+        function renderWilayahCards(summaryMap, kecamatanMap, grandTotal) {
+            const container = document.getElementById('wilayah-cards-container');
+            container.innerHTML = '';
+
+            Object.keys(MASTER_WILAYAH).forEach(w => {
+                const dataWilayah = summaryMap[w] || { tonaseMasuk: 0, count: 0 };
+                const kontribusi = grandTotal > 0 ? ((dataWilayah.tonaseMasuk / grandTotal) * 100).toFixed(1) : 0;
+                const kecamatanList = MASTER_WILAYAH[w] || [];
+
+                let kecamatanListHtml = '';
+                kecamatanList.forEach(kec => {
+                    const tonaseKec = kecamatanMap[kec] || 0;
+                    const porsiKec = dataWilayah.tonaseMasuk > 0 ? ((tonaseKec / dataWilayah.tonaseMasuk) * 100) : 0;
+                    const displayName = kec.endsWith("Direct") ? "Input Langsung" : kec;
+
+                    kecamatanListHtml += `
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-400">${displayName}</span>
+                                <span class="font-bold">${tonaseKec.toLocaleString('id-ID', {maximumFractionDigits:1})} Ton</span>
+                            </div>
+                            <div class="w-full h-1 bg-gray-700/30 rounded-full overflow-hidden">
+                                <div class="h-full bg-indigo-500" style="width: ${Math.min(porsiKec, 100)}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const cardHtml = `
+                    <div class="glass-card-3d p-5 flex flex-col justify-between h-full border-none">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-gray-700/30 pb-3 mb-3">
+                                <h3 class="font-bold text-sm text-gray-800 dark:text-white">${w}</h3>
+                                <div class="text-right">
+                                    <div class="text-base font-extrabold text-indigo-500 dark:text-indigo-400">${dataWilayah.tonaseMasuk.toLocaleString('id-ID', {maximumFractionDigits:1})} Ton</div>
+                                    <div class="text-[10px] text-gray-500 dark:text-gray-400">${kontribusi}% dari Total</div>
+                                </div>
+                            </div>
+                            <div class="space-y-3 pt-1">
+                                ${kecamatanListHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('dataTableBody');
+            const searchQuery = document.getElementById('searchTable').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            const { filteredSampah } = getFilteredData();
+            const searchedData = filteredSampah.filter(item => {
+                return item.wilayah.toLowerCase().includes(searchQuery) ||
+                       item.kecamatan.toLowerCase().includes(searchQuery) ||
+                       item.tanggal.includes(searchQuery);
+            });
+
+            document.getElementById('rowCount').textContent = `Showing ${searchedData.length} of ${dataSampah.length} total entries`;
+
+            searchedData.forEach((item) => {
+                const displayName = item.kecamatan.endsWith("Direct") ? item.wilayah + " (Direct)" : item.kecamatan;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 transition border-b border-gray-800/40";
+                tr.innerHTML = `
+                    <td class="p-3 text-gray-500 dark:text-gray-300 font-mono text-[11px]">${item.tanggal}</td>
+                    <td class="p-3 font-semibold text-gray-900 dark:text-white">${item.wilayah}</td>
+                    <td class="p-3 text-gray-600 dark:text-gray-300">${displayName}</td>
+                    <td class="p-3 text-right font-extrabold text-indigo-600 dark:text-indigo-400">${item.tonaseMasuk.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    <td class="p-3 text-center space-x-2">
+                        <button onclick="editSampahRow('${item.id}')" class="p-1 px-2 rounded bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500 hover:text-white transition text-xs" title="Edit">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="deleteSampahRow('${item.id}')" class="p-1 px-2 rounded bg-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500 hover:text-white transition text-xs" title="Hapus">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function handleSampahFormSubmit(event) {
+            event.preventDefault();
+
+            const editId = document.getElementById('editSampahId').value;
+            const tanggal = document.getElementById('inputTanggalSampah').value;
+            const wilayah = document.getElementById('selectWilayah').value;
+            const kecamatan = document.getElementById('selectKecamatan').value;
+            const tonaseMasuk = parseFloat(document.getElementById('inputTonaseMasuk').value) || 0;
+
+            if (editId) {
+                const idx = dataSampah.findIndex(d => d.id === editId);
+                if (idx !== -1) {
+                    dataSampah[idx] = { id: editId, tanggal, wilayah, kecamatan, tonaseMasuk };
+                }
+            } else {
+                dataSampah.push({
+                    id: Date.now().toString(),
+                    tanggal,
+                    wilayah,
+                    kecamatan,
+                    tonaseMasuk
+                });
+            }
+
+            saveData();
+            cancelEditSampah();
+            refreshDashboard();
+        }
+
+        function editSampahRow(id) {
+            const item = dataSampah.find(d => d.id === id);
+            if (!item) return;
+
+            document.getElementById('editSampahId').value = item.id;
+            document.getElementById('inputTanggalSampah').value = item.tanggal;
+            document.getElementById('selectWilayah').value = item.wilayah;
+            updateKecamatanDropdown();
+            document.getElementById('selectKecamatan').value = item.kecamatan;
+            document.getElementById('inputTonaseMasuk').value = item.tonaseMasuk;
+
+            document.getElementById('btnSubmitSampah').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Update Tonase';
+            document.getElementById('btnCancelSampah').classList.remove('hidden');
+            
+            // Scroll to form
+            document.getElementById('sampahForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function cancelEditSampah() {
+            document.getElementById('editSampahId').value = "";
+            document.getElementById('sampahForm').reset();
+            document.getElementById('inputTanggalSampah').value = getTodayString();
+            updateKecamatanDropdown();
+            document.getElementById('btnSubmitSampah').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Tonase';
+            document.getElementById('btnCancelSampah').classList.add('hidden');
+        }
+
+        function deleteSampahRow(id) {
+            showModal(
+                "Hapus Entry Tonase",
+                "Apakah Anda yakin ingin menghapus data tonase kecamatan ini?",
+                function() {
+                    dataSampah = dataSampah.filter(d => d.id !== id);
+                    saveData();
+                    refreshDashboard();
+                }
+            );
+        }
+
+        function handleProdukFormSubmit(event) {
+            event.preventDefault();
+
+            const tanggal = document.getElementById('inputTanggalProduk').value;
+            const rdfCurah = parseFloat(document.getElementById('inputRdfCurah').value) || 0;
+            const indocement = parseFloat(document.getElementById('inputIndocement').value) || 0;
+            const residu = parseFloat(document.getElementById('inputResidu').value) || 0;
+
+            const idx = dataProduk.findIndex(p => p.tanggal === tanggal);
+            if (idx !== -1) {
+                dataProduk[idx] = { id: dataProduk[idx].id, tanggal, rdfCurah, indocement, residu };
+            } else {
+                dataProduk.push({ id: Date.now().toString(), tanggal, rdfCurah, indocement, residu });
+            }
+
+            saveData();
+            refreshDashboard();
+        }
+
+        function drawBarChart2D(summaryMap, grandTotal) {
+            const canvas = document.getElementById('barChart2DCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const regions = Object.keys(MASTER_WILAYAH);
+            const shortNames = ["Jakut", "Jaktim", "Jakpus", "Jakbar", "Jaksel", "Kep. Seribu", "UPST"];
+            const colors = ["#3b82f6", "#8b5cf6", "#f59e0b", "#10b981", "#22c55e", "#14b8a6", "#6366f1"];
+
+            const values = regions.map(r => summaryMap[r] ? summaryMap[r].tonaseMasuk : 0);
+            const maxVal = Math.max(...values, 10);
+
+            const padding = { top: 40, bottom: 40, left: 20, right: 20 };
+            const chartWidth = width - padding.left - padding.right;
+            const chartHeight = height - padding.top - padding.bottom;
+            const barWidth = Math.min(chartWidth / regions.length * 0.6, 45);
+            const gap = chartWidth / regions.length;
+
+            regions.forEach((region, i) => {
+                const val = values[i];
+                const pct = grandTotal > 0 ? ((val / grandTotal) * 100).toFixed(1) : "0.0";
+                const barH = (val / maxVal) * chartHeight;
+                const x = padding.left + (i * gap) + (gap - barWidth) / 2;
+                const y = padding.top + (chartHeight - barH);
+
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.beginPath();
+                if (barH > 6) {
+                    ctx.roundRect(x, y, barWidth, barH, [6, 6, 0, 0]);
+                } else {
+                    ctx.rect(x, y, barWidth, Math.max(barH, 2));
+                }
+                ctx.fill();
+
+                ctx.fillStyle = currentTheme === 'dark' ? '#f8fafc' : '#0f172a';
+                ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${pct}%`, x + barWidth / 2, Math.max(y - 18, 15));
+
+                ctx.fillStyle = currentTheme === 'dark' ? '#94a3b8' : '#64748b';
+                ctx.font = '500 9px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText(`${val.toLocaleString('id-ID', {maximumFractionDigits:0})}T`, x + barWidth / 2, Math.max(y - 6, 26));
+
+                ctx.fillStyle = currentTheme === 'dark' ? '#cbd5e1' : '#334155';
+                ctx.font = '600 10px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText(shortNames[i], x + barWidth / 2, height - 12);
+            });
+        }
+
+        function drawDonutChart2D(curah, indocement, residu, totalTerolah) {
+            const canvas = document.getElementById('donutChart2DCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const slices = [
+                { name: "RDF Curah", value: curah, color: "#06b6d4" },
+                { name: "Indocement", value: indocement, color: "#6366f1" },
+                { name: "Residu", value: residu, color: "#f59e0b" }
+            ];
+
+            const total = curah + indocement + residu;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const outerRadius = Math.min(width, height) / 2 - 25;
+            const innerRadius = outerRadius * 0.58;
+
+            if (total === 0) {
+                ctx.strokeStyle = currentTheme === 'dark' ? '#334155' : '#e2e8f0';
+                ctx.lineWidth = outerRadius - innerRadius;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, (outerRadius + innerRadius) / 2, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.fillStyle = currentTheme === 'dark' ? '#94a3b8' : '#64748b';
+                ctx.font = '600 11px "Plus Jakarta Sans", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText("Belum Ada Data", centerX, centerY);
+                return;
+            }
+
+            let startAngle = -Math.PI / 2;
+
+            slices.forEach((slice) => {
+                if (slice.value <= 0) return;
+
+                const sliceAngle = (slice.value / total) * Math.PI * 2;
+                const endAngle = startAngle + sliceAngle;
+                const pct = ((slice.value / total) * 100).toFixed(1);
+
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+                ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+                ctx.closePath();
+                ctx.fillStyle = slice.color;
+                ctx.fill();
+
+                const midAngle = startAngle + sliceAngle / 2;
+                const textRadius = (outerRadius + innerRadius) / 2;
+                const tx = centerX + Math.cos(midAngle) * textRadius;
+                const ty = centerY + Math.sin(midAngle) * textRadius;
+
+                if (sliceAngle > 0.2) {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'extrabold 11px "Plus Jakarta Sans", sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(`${pct}%`, tx, ty);
+                }
+
+                startAngle = endAngle;
+            });
+
+            ctx.fillStyle = currentTheme === 'dark' ? '#ffffff' : '#0f172a';
+            ctx.font = 'extrabold 13px "Plus Jakarta Sans", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${totalTerolah.toLocaleString('id-ID', {maximumFractionDigits:0})} Ton`, centerX, centerY - 6);
+
+            ctx.fillStyle = currentTheme === 'dark' ? '#94a3b8' : '#64748b';
+            ctx.font = '600 9px "Plus Jakarta Sans", sans-serif';
+            ctx.fillText("TOTAL TEROLAH", centerX, centerY + 10);
+        }
+
+        function downloadDashboardImage() {
+            const btn = document.getElementById('btnDownloadDashboard');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Mengolah PNG...';
+            btn.disabled = true;
+
+            const captureArea = document.getElementById('dashboardCaptureArea');
+
+            setTimeout(() => {
+                html2canvas(captureArea, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    windowWidth: 1600,
+                    backgroundColor: currentTheme === 'dark' ? '#0f172a' : '#f8fafc',
+                    logging: false,
+                    ignoreElements: (element) => {
+                        return element.id === 'customModal' || element.classList.contains('no-export');
+                    }
+                }).then(canvas => {
+                    const image = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    const dateStr = getTodayString();
+                    link.download = `Report_RDF_Jakarta_${dateStr}.png`;
+                    link.href = image;
+                    link.click();
+
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Berhasil!';
+                    setTimeout(() => {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Gagal mengunduh gambar:', err);
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                });
+            }, 200);
+        }
+    </script>
+</body>
+</html>
