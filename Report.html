@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Monitoring Tonase Sampah & Produk RDF DKI Jakarta 3D</title>
+    <title>Executive Dashboard Monitoring Tonase Sampah & Produk RDF DKI Jakarta</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -13,351 +13,490 @@
                 extend: {
                     fontFamily: {
                         sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#10b981',
+                            600: '#059669',
+                            900: '#064e3b',
+                        },
+                        darkbg: '#050811',
+                        darkcard: '#0f172a',
                     }
                 }
             }
         }
     </script>
-    <!-- Three.js for 3D Visualizations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- html2canvas for Dashboard Screenshot Download -->
+    <!-- jsPDF & html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- FontAwesome Icons -->
+    <!-- Icons & Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         * {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        /* Smooth Theme Transitions & Clean Subtle Backgrounds */
         body {
             transition: background-color 0.3s ease, color 0.3s ease;
             min-height: 100vh;
         }
 
-        /* DARK THEME STYLES - Clean & Elegant Subtle 3D Depth */
+        /* HIGH-CONTRAST DARK EXECUTIVE THEME */
         body.dark {
-            background-color: #0f172a;
+            background-color: #050811;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.12) 0px, transparent 50%);
+            background-attachment: fixed;
             color: #f8fafc;
         }
 
-        body.dark .glass-card-3d {
-            background: #1e293b;
-            border: 1px solid #334155;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        body.dark .glass-card {
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
 
-        body.dark .glass-card-3d:hover {
-            border-color: #475569;
-            box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.4);
+        body.dark .glass-card:hover {
+            border-color: rgba(129, 140, 248, 0.4);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 20px rgba(99, 102, 241, 0.25);
         }
 
-        body.dark .input-3d {
+        body.dark .input-luxury {
+            background: #090e1a;
+            border: 1.5px solid #334155;
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        body.dark .input-luxury:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.3);
+        }
+
+        body.dark .input-luxury option {
             background: #0f172a;
-            border: 1px solid #334155;
             color: #ffffff;
         }
 
-        body.dark .input-3d option {
-            background: #0f172a;
-            color: #ffffff;
-        }
-
-        /* LIGHT THEME STYLES - Clean & Crisp */
+        /* HIGH-CONTRAST LIGHT EXECUTIVE THEME */
         body.light {
             background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%);
+            background-attachment: fixed;
             color: #0f172a;
         }
 
-        body.light .glass-card-3d {
+        body.light .glass-card {
             background: #ffffff;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 20px -5px rgba(148, 163, 184, 0.12), 0 4px 6px -2px rgba(148, 163, 184, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid #cbd5e1;
+            box-shadow: 0 10px 30px -5px rgba(148, 163, 184, 0.25);
         }
 
-        body.light .glass-card-3d:hover {
-            border-color: #cbd5e1;
-            box-shadow: 0 12px 24px -5px rgba(148, 163, 184, 0.2);
+        body.light .glass-card:hover {
+            border-color: #94a3b8;
+            box-shadow: 0 15px 35px -5px rgba(148, 163, 184, 0.35);
         }
 
-        body.light .input-3d {
+        body.light .input-luxury {
             background: #f1f5f9;
-            border: 1px solid #cbd5e1;
+            border: 1.5px solid #94a3b8;
             color: #0f172a;
+            font-weight: 700;
         }
 
-        body.light .input-3d option {
+        body.light .input-luxury option {
             background: #ffffff;
             color: #0f172a;
         }
 
-        body.light .text-gray-400 { color: #64748b; }
-        body.light .text-gray-300 { color: #475569; }
-        body.light .text-white { color: #0f172a; }
+        /* High-Contrast Light Mode Text Overrides */
+        body.light .text-white { color: #0f172a !important; }
+        body.light .text-slate-100 { color: #0f172a !important; }
+        body.light .text-slate-200 { color: #1e293b !important; }
+        body.light .text-slate-300 { color: #334155 !important; }
+        body.light .text-slate-400 { color: #475569 !important; }
+        
+        body.light .text-indigo-300 { color: #3730a3 !important; }
+        body.light .text-indigo-400 { color: #4338ca !important; }
+        body.light .text-cyan-300 { color: #0e7490 !important; }
+        body.light .text-cyan-400 { color: #0284c7 !important; }
+        body.light .text-amber-300 { color: #b45309 !important; }
+        body.light .text-amber-400 { color: #d97706 !important; }
+        body.light .text-emerald-300 { color: #047857 !important; }
+        body.light .text-emerald-400 { color: #059669 !important; }
+        body.light .text-rose-300 { color: #be123c !important; }
+        body.light .text-rose-400 { color: #e11d48 !important; }
+        body.light .text-purple-300 { color: #7e22ce !important; }
+        body.light .text-purple-400 { color: #9333ea !important; }
 
-        /* Card & Button Styles */
-        .glass-card-3d {
-            border-radius: 1rem;
-            transition: all 0.2s ease;
+        body.light .text-green-400 { color: #15803d !important; }
+        body.light .text-blue-400 { color: #1d4ed8 !important; }
+        body.light .text-yellow-400 { color: #a16207 !important; }
+        body.light .text-pink-400 { color: #be185d !important; }
+        body.light .text-orange-400 { color: #c2410c !important; }
+
+        /* Light mode backgrounds */
+        body.light .bg-slate-900,
+        body.light .bg-slate-900\/30,
+        body.light .bg-slate-900\/50,
+        body.light .bg-slate-900\/60,
+        body.light .bg-slate-900\/80,
+        body.light .bg-slate-900\/90,
+        body.light .bg-slate-950 {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
         }
 
-        .gradient-text {
-            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #0d9488 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        body.light .bg-slate-800 {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
         }
 
-        .btn-3d-indigo {
-            background: #4f46e5;
-            transition: background-color 0.2s ease;
-        }
-        .btn-3d-indigo:hover {
-            background: #4338ca;
+        /* Light mode table row tints */
+        body.light thead tr {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
         }
 
-        .btn-3d-emerald {
-            background: #059669;
-            transition: background-color 0.2s ease;
+        body.light tr.bg-green-950\/40 { background-color: #f0fdf4 !important; border-color: #22c55e !important; }
+        body.light tr.bg-blue-950\/40 { background-color: #eff6ff !important; border-color: #3b82f6 !important; }
+        body.light tr.bg-yellow-950\/40 { background-color: #fefce8 !important; border-color: #eab308 !important; }
+        body.light tr.bg-pink-950\/40 { background-color: #fdf2f8 !important; border-color: #ec4899 !important; }
+        body.light tr.bg-purple-950\/40 { background-color: #faf5ff !important; border-color: #a855f7 !important; }
+        body.light tr.bg-cyan-950\/40 { background-color: #ecfeff !important; border-color: #06b6d4 !important; }
+        body.light tr.bg-orange-950\/40 { background-color: #fff7ed !important; border-color: #f97316 !important; }
+
+        /* Maintain white text on action buttons */
+        body.light .btn-luxury-indigo,
+        body.light .btn-luxury-indigo *,
+        body.light .btn-luxury-emerald,
+        body.light .btn-luxury-emerald *,
+        body.light .btn-luxury-purple,
+        body.light .btn-luxury-purple *,
+        body.light .bg-indigo-600,
+        body.light .bg-indigo-600 *,
+        body.light .bg-rose-600,
+        body.light .bg-rose-600 * {
+            color: #ffffff !important;
         }
-        .btn-3d-emerald:hover {
-            background: #047857;
+
+        /* Buttons */
+        .btn-luxury-indigo {
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            transition: all 0.2s ease-in-out;
         }
+        .btn-luxury-indigo:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79, 70, 229, 0.6); background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); }
+
+        .btn-luxury-emerald {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-luxury-emerald:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6); background: linear-gradient(135deg, #10b981 0%, #065f46 100%); }
+
+        .btn-luxury-purple {
+            background: linear-gradient(135deg, #9333ea 0%, #6b21a8 100%);
+            color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4);
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-luxury-purple:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(147, 51, 234, 0.6); background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%); }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-
-        .chart-3d-canvas {
-            width: 100% !important;
-            height: 100% !important;
-            outline: none;
-        }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
     </style>
 </head>
 
-<body class="dark p-4 md:p-6 lg:p-8">
-    <div id="dashboardCaptureArea" class="w-full max-w-7xl mx-auto flex flex-col gap-6">
-        
-        <!-- Reconstructed Header Structure -->
-        <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 glass-card-3d p-6">
-            <div class="flex items-center gap-5 group">
-                <!-- Removed border, shadow, and fixed width so the logo can sit naturally without a box -->
-                <div class="relative h-14 md:h-16 cursor-pointer shrink-0 rounded-lg overflow-hidden" onclick="document.getElementById('logoInput').click()">
-                    <img id="appLogo" src="https://placehold.co/100x100/1e293b/4f46e5?text=DKI" alt="Logo" class="h-full w-auto object-contain">
-                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold text-center px-1">
-                        Ganti
+<body class="dark p-3 md:p-6 lg:p-8">
+
+    <!-- Login Screen Modal -->
+    <div id="loginScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/95 backdrop-blur-2xl transition-opacity duration-500">
+        <div class="glass-card p-8 max-w-md w-full mx-4 rounded-2xl flex flex-col items-center relative overflow-hidden border-2 border-indigo-500/40 shadow-2xl">
+            <!-- Decorative Glow -->
+            <div class="absolute -top-20 -left-20 w-40 h-40 bg-indigo-500/30 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-500/30 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="w-24 h-24 mb-3 relative flex items-center justify-center">
+                <img id="loginLogo" src="https://placehold.co/120x120/1e293b/818cf8?text=RDF+JAKARTA" alt="RDF Logo" class="w-full h-full object-contain">
+            </div>
+            
+            <h2 class="text-2xl font-black text-white tracking-tight text-center mt-2">RDF Plant Jakarta</h2>
+            <p class="text-xs text-indigo-300 font-extrabold tracking-widest uppercase mb-6">Executive Reporting Portal</p>
+            
+            <form id="loginForm" class="w-full space-y-4" onsubmit="handleLogin(event)">
+                <div>
+                    <label class="block text-xs font-black text-slate-200 uppercase tracking-wider mb-1.5">Username</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400 text-sm"></i>
+                        <input type="text" id="loginUsername" class="w-full pl-11 pr-4 py-3 rounded-xl input-luxury text-xs focus:outline-none transition-all" placeholder="Masukkan username" required>
                     </div>
                 </div>
-                <input type="file" id="logoInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
-                
                 <div>
-                    <!-- Removed gradient-text class to fix the black background block issue in html2canvas -->
-                    <h1 class="text-xl md:text-2xl font-black tracking-tight uppercase text-indigo-700 dark:text-indigo-400">
-                        Monthly Report
+                    <label class="block text-xs font-black text-slate-200 uppercase tracking-wider mb-1.5">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400 text-sm"></i>
+                        <input type="password" id="loginPassword" class="w-full pl-11 pr-4 py-3 rounded-xl input-luxury text-xs focus:outline-none transition-all" placeholder="Masukkan password" required>
+                    </div>
+                </div>
+                
+                <div id="loginError" class="hidden text-rose-300 text-xs font-extrabold text-center bg-rose-950/80 py-2.5 rounded-xl border border-rose-500/50">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Username atau password tidak valid!
+                </div>
+
+                <button type="submit" id="loginBtn" class="w-full py-3.5 px-4 mt-2 rounded-xl btn-luxury-indigo font-black text-white text-xs tracking-wider uppercase flex justify-center items-center gap-2 cursor-pointer shadow-lg">
+                    <i class="fa-solid fa-right-to-bracket"></i> Masuk Executive Dashboard
+                </button>
+            </form>
+            
+            <div class="mt-6 text-[11px] text-slate-300 font-extrabold uppercase tracking-widest flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Unit Pengelola Sampah Terpadu
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div id="dashboardCaptureArea" class="w-full max-w-7xl mx-auto hidden flex-col gap-6">
+        
+        <!-- Header Section -->
+        <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 glass-card p-6 rounded-2xl relative overflow-hidden">
+            <div class="flex items-center gap-5 group">
+                <div class="relative h-20 w-20 shrink-0 flex items-center justify-center">
+                    <img id="appLogo" src="../img/logo_RDF.png" alt="Logo" class="h-full w-full object-contain">
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400 text-xs font-black text-indigo-300 uppercase tracking-widest">
+                            Monthly Executive Dashboard
+                        </span>
+                    </div>
+                    <h1 class="text-xl md:text-2xl font-black tracking-tight text-white dark:text-white mt-1">
+                        Monitoring Tonase & Produk RDF
                     </h1>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mt-1">
-                        RDF Plant DKI Jakarta
+                    <p class="text-xs text-slate-300 dark:text-slate-300 font-extrabold">
+                        Unit Pengelola Sampah Terpadu (UPST) DKI Jakarta
                     </p>
                 </div>
             </div>
 
-            <!-- Action Controls & Theme Switcher -->
-            <div class="flex flex-wrap items-center gap-3 no-export">
-                <button onclick="downloadDashboardImage()" id="btnDownloadDashboard" class="px-3.5 py-2 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-2 shadow-lg">
-                    <i class="fa-solid fa-file-image"></i> Unduh Dashboard
+            <!-- Top Action Controls -->
+            <div class="flex flex-wrap items-center gap-2.5 no-export">
+                <button onclick="downloadDashboardImage()" id="btnDownloadDashboard" class="px-4 py-2.5 text-xs font-black rounded-xl btn-luxury-indigo text-white flex items-center gap-2 cursor-pointer shadow-lg">
+                    <i class="fa-solid fa-camera text-sm"></i> Tangkap Gambar
                 </button>
 
-                <button onclick="toggleTheme()" class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-gray-200 border border-slate-700 transition flex items-center gap-2">
-                    <i id="themeIcon" class="fa-solid fa-sun text-amber-400"></i>
+                <button onclick="toggleTheme()" class="px-4 py-2.5 text-xs font-black rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-600 transition flex items-center gap-2 cursor-pointer shadow-md">
+                    <i id="themeIcon" class="fa-solid fa-sun text-amber-400 text-sm"></i>
                     <span id="themeLabel">Mode Terang</span>
                 </button>
                 
-                <button onclick="resetData()" class="px-3 py-2 text-xs font-semibold rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 border border-rose-900/50 transition flex items-center gap-2">
-                    <i class="fa-solid fa-trash-can"></i> Reset Data
+                <button onclick="resetData()" class="px-4 py-2.5 text-xs font-black rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-700/60 transition flex items-center gap-2 cursor-pointer shadow-md">
+                    <i class="fa-solid fa-trash-can"></i> Reset
                 </button>
 
-                <div class="px-3 py-2 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-xs font-semibold text-emerald-400 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    System Live
+                <div class="px-3.5 py-2 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-xs font-black text-emerald-300 flex items-center gap-2 shadow-md">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    Live System
                 </div>
+                
+                <button onclick="handleLogout()" class="px-3.5 py-2.5 text-xs font-black rounded-xl bg-slate-800 hover:bg-rose-900 text-slate-200 hover:text-white border border-slate-600 transition flex items-center gap-2 cursor-pointer shadow-md" title="Keluar Portal">
+                    <i class="fa-solid fa-power-off text-rose-400"></i>
+                </button>
             </div>
         </header>
 
-        <!-- Date Range Filter Bar -->
-        <section class="w-full glass-card-3d p-4">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-2 text-indigo-400 font-bold text-sm">
-                    <i class="fa-solid fa-calendar-days text-lg"></i>
-                    <span>PERIODE BULAN EVALUASI</span>
+        <!-- EXECUTIVE MONTH FILTER BAR -->
+        <section class="w-full glass-card p-5 rounded-2xl">
+            <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400 flex items-center justify-center text-indigo-300 text-lg">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-black text-white dark:text-white tracking-wide uppercase">Filter Periode Evaluasi</h2>
+                        <p class="text-xs text-slate-300 font-bold">Pilih rentang bulan laporan tonase</p>
+                    </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto no-export">
-                    <div class="flex items-center gap-2 text-xs text-gray-400 flex-1 md:flex-initial">
-                        <span>Dari:</span>
-                        <input type="month" id="filterStartMonth" onchange="applyDateFilter()" class="p-2 rounded-xl input-3d text-xs focus:outline-none w-full md:w-36">
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto no-export">
+                    <div class="flex items-center gap-2 bg-slate-900/80 p-2 rounded-xl border border-slate-700">
+                        <span class="text-xs font-black text-indigo-300 uppercase tracking-wider pl-1">Dari:</span>
+                        <select id="filterStartMonth" onchange="applyDateFilter()" class="p-2 rounded-lg input-luxury text-xs font-extrabold focus:outline-none"></select>
+                        <select id="filterStartYear" onchange="applyDateFilter()" class="p-2 rounded-lg input-luxury text-xs font-extrabold focus:outline-none"></select>
                     </div>
-
-                    <div class="flex items-center gap-2 text-xs text-gray-400 flex-1 md:flex-initial">
-                        <span>Sampai:</span>
-                        <input type="month" id="filterEndMonth" onchange="applyDateFilter()" class="p-2 rounded-xl input-3d text-xs focus:outline-none w-full md:w-36">
+                    <div class="flex items-center gap-2 bg-slate-900/80 p-2 rounded-xl border border-slate-700">
+                        <span class="text-xs font-black text-emerald-300 uppercase tracking-wider pl-1">s/d:</span>
+                        <select id="filterEndMonth" onchange="applyDateFilter()" class="p-2 rounded-lg input-luxury text-xs font-extrabold focus:outline-none"></select>
+                        <select id="filterEndYear" onchange="applyDateFilter()" class="p-2 rounded-lg input-luxury text-xs font-extrabold focus:outline-none"></select>
                     </div>
-
-                    <button onclick="resetDateFilter()" class="px-3 py-2 rounded-xl bg-slate-700/60 hover:bg-slate-600 text-xs font-semibold text-gray-300 transition flex items-center gap-1">
-                        <i class="fa-solid fa-filter-circle-xmark"></i> Reset
-                    </button>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="setFilterPreset('thisYear')" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-black text-slate-100 transition border border-slate-600 cursor-pointer">Tahun Ini</button>
+                        <button onclick="setFilterPreset('last3')" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-black text-slate-100 transition border border-slate-600 cursor-pointer">3 Bln Terakhir</button>
+                        <button onclick="resetDateFilter()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black transition flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-arrows-rotate text-[10px]"></i> Semua
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
 
         <main class="w-full space-y-6">
-            <!-- Summary Cards Grid -->
+            <!-- KPI METRICS SUMMARY GRID -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <!-- Card 1: Total Sampah Masuk -->
-                <div class="glass-card-3d p-5 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl"></div>
-                    <div class="flex items-center justify-between text-gray-400 mb-2">
-                        <span class="text-xs font-bold uppercase tracking-wider">Total Sampah Masuk</span>
-                        <i class="fa-solid fa-truck-moving text-indigo-400 text-lg"></i>
+                
+                <div class="glass-card p-5 rounded-2xl relative overflow-hidden group border-2 border-indigo-500/30">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-black uppercase tracking-wider text-indigo-300 dark:text-indigo-300">Total Sampah Masuk</span>
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400 flex items-center justify-center text-indigo-300">
+                            <i class="fa-solid fa-truck-moving text-base"></i>
+                        </div>
                     </div>
-                    <div class="text-3xl font-black tracking-tight mb-1" id="stat-total-sampah">0.00 <span class="text-sm font-normal text-gray-400">Ton</span></div>
-                    <div class="text-xs text-indigo-400 flex items-center gap-1 font-medium">
-                        <i class="fa-solid fa-city"></i> Sum All Sub-Districts
-                    </div>
-                </div>
-
-                <!-- Card 2: Total RDF Terkirim -->
-                <div class="glass-card-3d p-5 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl"></div>
-                    <div class="flex items-center justify-between text-gray-400 mb-2">
-                        <span class="text-xs font-bold uppercase tracking-wider">Total RDF Terkirim</span>
-                        <i class="fa-solid fa-boxes-packing text-cyan-400 text-lg"></i>
-                    </div>
-                    <div class="text-3xl font-black tracking-tight mb-1 text-cyan-400" id="stat-total-rdf">0.00 <span class="text-sm font-normal text-gray-400">Ton</span></div>
-                    <div class="text-xs text-cyan-400 flex items-center gap-1 font-medium">
-                        <i class="fa-solid fa-circle-check"></i> RDF Curah + Indocement
+                    <div class="text-3xl lg:text-4xl font-black tracking-tight mb-1 text-white dark:text-white" id="stat-total-sampah">0.00 <span class="text-sm font-bold text-slate-300">Ton</span></div>
+                    <div class="text-xs text-slate-200 dark:text-slate-200 flex items-center gap-1.5 font-bold">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span> Akumulasi Wilayah DKI
                     </div>
                 </div>
 
-                <!-- Card 3: Total Residu -->
-                <div class="glass-card-3d p-5 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl"></div>
-                    <div class="flex items-center justify-between text-gray-400 mb-2">
-                        <span class="text-xs font-bold uppercase tracking-wider">Total Residu</span>
-                        <i class="fa-solid fa-dumpster text-amber-400 text-lg"></i>
+                <div class="glass-card p-5 rounded-2xl relative overflow-hidden group border-2 border-cyan-500/30">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-black uppercase tracking-wider text-cyan-300 dark:text-cyan-300">Total RDF Terkirim</span>
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-300">
+                            <i class="fa-solid fa-boxes-packing text-base"></i>
+                        </div>
                     </div>
-                    <div class="text-3xl font-black tracking-tight mb-1 text-amber-400" id="stat-total-residu">0.00 <span class="text-sm font-normal text-gray-400">Ton</span></div>
-                    <div class="text-xs text-amber-400 flex items-center gap-1 font-medium">
-                        <i class="fa-solid fa-triangle-exclamation"></i> Terpisah dari RDF
+                    <div class="text-3xl lg:text-4xl font-black tracking-tight mb-1 text-cyan-300 dark:text-cyan-300" id="stat-total-rdf">0.00 <span class="text-sm font-bold text-slate-300">Ton</span></div>
+                    <div class="text-xs text-cyan-200 dark:text-cyan-200 flex items-center gap-1.5 font-bold">
+                        <i class="fa-solid fa-circle-check text-[11px]"></i> Curah + Indocement
                     </div>
                 </div>
 
-                <!-- Card 4: Total Produk Terolah -->
-                <div class="glass-card-3d p-5 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl"></div>
-                    <div class="flex items-center justify-between text-gray-400 mb-2">
-                        <span class="text-xs font-bold uppercase tracking-wider">Total Terolah</span>
-                        <i class="fa-solid fa-chart-line text-emerald-400 text-lg"></i>
+                <div class="glass-card p-5 rounded-2xl relative overflow-hidden group border-2 border-amber-500/30">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-black uppercase tracking-wider text-amber-300 dark:text-amber-300">Total Residu</span>
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400 flex items-center justify-center text-amber-300">
+                            <i class="fa-solid fa-dumpster text-base"></i>
+                        </div>
                     </div>
-                    <div class="text-3xl font-black text-emerald-400 tracking-tight mb-1" id="stat-total-terolah">0.00 <span class="text-sm font-normal text-gray-400">Ton</span></div>
-                    <div class="text-xs text-gray-400 font-medium" id="stat-rasio-terolah">
-                        Rasio Pengolahan: 0%
+                    <div class="text-3xl lg:text-4xl font-black tracking-tight mb-1 text-amber-300 dark:text-amber-300" id="stat-total-residu">0.00 <span class="text-sm font-bold text-slate-300">Ton</span></div>
+                    <div class="text-xs text-amber-200 dark:text-amber-200 flex items-center gap-1.5 font-bold">
+                        <i class="fa-solid fa-triangle-exclamation text-[11px]"></i> Hasil Samping Pengolahan
+                    </div>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl relative overflow-hidden group border-2 border-emerald-500/30">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-black uppercase tracking-wider text-emerald-300 dark:text-emerald-300">Total Terolah</span>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-300">
+                            <i class="fa-solid fa-chart-line text-base"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl lg:text-4xl font-black tracking-tight mb-1 text-emerald-300 dark:text-emerald-300" id="stat-total-terolah">0.00 <span class="text-sm font-bold text-slate-300">Ton</span></div>
+                    <div class="text-xs text-slate-100 font-extrabold" id="stat-rasio-terolah">
+                        Efisiensi Pengolahan: 0%
                     </div>
                 </div>
             </div>
 
-            <!-- 2D Charts Viewports -->
+            <!-- 2D CHARTS SECTION -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <!-- 2D Bar Chart: Tonase Sampah Masuk per Wilayah -->
-                <div class="glass-card-3d p-6 lg:col-span-2 flex flex-col justify-between relative min-h-[380px]">
-                    <div class="flex justify-between items-center mb-2 z-10">
+                <div class="glass-card p-6 rounded-2xl lg:col-span-2 flex flex-col justify-between relative min-h-[380px] border-2 border-slate-700/60">
+                    <div class="flex justify-between items-center mb-3">
                         <div>
-                            <h3 class="text-lg font-bold flex items-center gap-2">
+                            <h3 class="text-base font-black flex items-center gap-2 text-white dark:text-white">
                                 <i class="fa-solid fa-chart-column text-indigo-400"></i> Sampah Masuk per Wilayah
                             </h3>
-                            <p class="text-xs text-gray-400">Distribusi tonase sampah masuk beserta persentase kontribusi</p>
+                            <p class="text-xs font-bold text-slate-300 dark:text-slate-300">Akumulasi tonase berdasarkan distribusi region</p>
                         </div>
-                        <span class="text-[10px] bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 px-2.5 py-1 rounded-full font-bold">2D CHART</span>
                     </div>
-
-                    <!-- 2D Canvas Container -->
-                    <div class="relative w-full h-72 flex-1 rounded-xl overflow-hidden bg-slate-900/10 border border-gray-700/30">
+                    <div class="relative w-full h-72 flex-1 rounded-xl overflow-hidden bg-slate-900/50 border border-slate-700">
                         <canvas id="barChart2DCanvas" class="w-full h-full block"></canvas>
                     </div>
                 </div>
 
-                <!-- 2D Donut Chart: Komposisi Produk Terolah -->
-                <div class="glass-card-3d p-6 flex flex-col justify-between relative min-h-[380px]">
-                    <div class="z-10">
-                        <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-lg font-bold flex items-center gap-2">
-                                <i class="fa-solid fa-chart-pie text-cyan-400"></i> Komposisi Produk
-                            </h3>
-                            <span class="text-[10px] bg-cyan-950/80 text-cyan-300 border border-cyan-500/30 px-2.5 py-1 rounded-full font-bold">2D CHART</span>
-                        </div>
-                        <p class="text-xs text-gray-400 mb-2">Persentase RDF Curah, Indocement, & Residu</p>
+                <div class="glass-card p-6 rounded-2xl flex flex-col justify-between relative min-h-[380px] border-2 border-slate-700/60">
+                    <div>
+                        <h3 class="text-base font-black flex items-center gap-2 text-white dark:text-white">
+                            <i class="fa-solid fa-chart-pie text-cyan-400"></i> Komposisi Hasil
+                        </h3>
+                        <p class="text-xs font-bold text-slate-300 dark:text-slate-300 mb-3">Proporsi RDF Curah, Indocement, & Residu</p>
                     </div>
-
-                    <!-- 2D Donut Canvas Container -->
-                    <div class="relative w-full h-64 flex-1 rounded-xl overflow-hidden bg-slate-900/10 border border-gray-700/30 flex items-center justify-center">
+                    <div class="relative w-full h-60 flex-1 rounded-xl overflow-hidden bg-slate-900/50 border border-slate-700 flex items-center justify-center">
                         <canvas id="donutChart2DCanvas" class="w-full h-full block"></canvas>
                     </div>
-
-                    <!-- Product Legend -->
-                    <div class="grid grid-cols-3 gap-2 text-center text-[10px] pt-3 font-semibold">
-                        <div class="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">RDF Curah</div>
-                        <div class="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400">Indocement</div>
-                        <div class="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400">Residu</div>
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs pt-3 font-extrabold">
+                        <div class="p-1.5 rounded-lg bg-cyan-950 border border-cyan-400 text-cyan-300">RDF Curah</div>
+                        <div class="p-1.5 rounded-lg bg-indigo-950 border border-indigo-400 text-indigo-300">Indocement</div>
+                        <div class="p-1.5 rounded-lg bg-amber-950 border border-amber-400 text-amber-300">Residu</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Ringkasan Sampah Masuk per Wilayah & Kecamatan -->
-            <section class="space-y-4 pt-4">
+            <!-- RINGKASAN PER WILAYAH & KECAMATAN CARDS -->
+            <section class="space-y-4 pt-2">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-lg font-bold flex items-center gap-2">
-                            <i class="fa-solid fa-city text-indigo-400"></i> Ringkasan Tonase per Kecamatan
+                        <h2 class="text-base font-black flex items-center gap-2 text-white dark:text-white">
+                            <i class="fa-solid fa-city text-indigo-400"></i> Ringkasan Tonase Per Region, Sub-Distrik & Produk Lainnya
                         </h2>
-                        <p class="text-xs text-gray-400">Total akumulasi otomatis terhitung berdasarkan data entry</p>
+                        <p class="text-xs font-bold text-slate-300 dark:text-slate-300">Rincian kontribusi sampah dan pergerakan produk lainnya</p>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5" id="wilayah-cards-container">
-                    <!-- Dynamically generated Wilayah + Kecamatan list cards -->
+                    <!-- Cards will be populated dynamically -->
                 </div>
             </section>
 
-            <!-- Input Forms & Detailed Data Table -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4 no-export">
+            <!-- MANUAL INPUT MODULES & DETAILED DATA TABLE -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2 items-start">
                 
-                <!-- MODULE 1 & 2: Input Forms Column -->
-                <div class="glass-card-3d p-6 lg:col-span-1 border-t-2 border-indigo-500 space-y-8">
+                <!-- INPUT FORMS COLUMN -->
+                <div class="glass-card p-6 rounded-2xl lg:col-span-1 border-t-4 border-indigo-500 space-y-8 no-export sticky top-6">
                     
-                    <!-- Form 1: Sampah Masuk per Kecamatan -->
+                    <!-- FORM 1: Input Sampah Masuk -->
                     <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold flex items-center gap-2">
-                                <i class="fa-solid fa-truck-ramp-box text-indigo-400"></i> Input Sampah Masuk
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-700">
+                            <h3 class="text-base font-black flex items-center gap-2 text-white dark:text-white">
+                                <i class="fa-solid fa-truck-ramp-box text-indigo-400"></i> Form Sampah Masuk
                             </h3>
-                            <span class="text-[10px] bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-bold">ENTRY DATA</span>
+                            <span class="text-xs font-black px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400">Bulanan</span>
                         </div>
                         
-                        <form id="sampahForm" onsubmit="handleSampahFormSubmit(event)" class="space-y-3">
+                        <form id="sampahForm" onsubmit="handleSampahFormSubmit(event)" class="space-y-4">
                             <input type="hidden" id="editSampahId" value="">
-
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">BULAN</label>
-                                <input type="month" id="inputTanggalSampah" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Bulan Entry</label>
+                                    <select id="inputBulanSampah" class="w-full p-3 rounded-xl input-luxury text-xs font-extrabold focus:outline-none" required></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Tahun Entry</label>
+                                    <select id="inputTahunSampah" class="w-full p-3 rounded-xl input-luxury text-xs font-extrabold focus:outline-none" required></select>
+                                </div>
                             </div>
-
                             <div>
-                                <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Wilayah</label>
-                                <select id="selectWilayah" onchange="updateKecamatanDropdown()" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none">
+                                <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Wilayah</label>
+                                <select id="selectWilayah" onchange="updateKecamatanDropdown()" class="w-full p-3 rounded-xl input-luxury text-xs font-extrabold focus:outline-none">
                                     <option value="Jakarta Utara">Jakarta Utara</option>
                                     <option value="Jakarta Timur">Jakarta Timur</option>
                                     <option value="Jakarta Pusat">Jakarta Pusat</option>
@@ -367,137 +506,255 @@
                                     <option value="UPST">UPST</option>
                                 </select>
                             </div>
-
                             <div>
-                                <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Kecamatan</label>
-                                <select id="selectKecamatan" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none">
-                                    <!-- Dynamic options -->
-                                </select>
+                                <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Kecamatan</label>
+                                <select id="selectKecamatan" class="w-full p-3 rounded-xl input-luxury text-xs font-extrabold focus:outline-none"></select>
                             </div>
-
                             <div>
-                                <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Tonase (Ton)</label>
-                                <input type="number" step="0.01" min="0" id="inputTonaseMasuk" placeholder="0.00" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                                <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Tonase Masuk (Ton)</label>
+                                <input type="number" step="0.01" min="0" id="inputTonaseMasuk" placeholder="0.00" class="w-full p-3 rounded-xl input-luxury text-sm font-black focus:outline-none" required>
                             </div>
-
                             <div class="flex gap-2 pt-1">
-                                <button type="submit" id="btnSubmitSampah" class="flex-1 py-2.5 px-4 rounded-xl btn-3d-indigo font-bold text-white text-xs tracking-wide flex items-center justify-center gap-2">
+                                <button type="submit" id="btnSubmitSampah" class="flex-1 py-3.5 px-4 rounded-xl btn-luxury-indigo font-black text-white text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-md">
                                     <i class="fa-solid fa-floppy-disk"></i> Simpan Tonase
                                 </button>
-                                <button type="button" onclick="cancelEditSampah()" id="btnCancelSampah" class="hidden px-3 py-2.5 rounded-xl bg-gray-700 text-gray-300 text-xs font-semibold hover:bg-gray-600 transition">
-                                    Batal
-                                </button>
+                                <button type="button" onclick="cancelEditSampah()" id="btnCancelSampah" class="hidden px-4 py-3.5 rounded-xl bg-slate-800 text-slate-200 text-xs font-bold hover:bg-slate-700 transition cursor-pointer shadow-md">Batal</button>
                             </div>
                         </form>
                     </div>
 
-                    <!-- Form 2: Input Hasil Pengolahan Produk -->
-                    <div class="pt-6 border-t border-gray-800">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold flex items-center gap-2">
-                                <i class="fa-solid fa-industry text-emerald-400"></i> Hasil Pengolahan
+                    <!-- FORM 2: Input Hasil Pengolahan (Produk) -->
+                    <div class="pt-6 border-t border-slate-700">
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-700">
+                            <h3 class="text-base font-black flex items-center gap-2 text-white dark:text-white">
+                                <i class="fa-solid fa-industry text-emerald-400"></i> Form Hasil Pengolahan
                             </h3>
+                            <span class="text-xs font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400">Bulanan</span>
                         </div>
 
-                        <form id="produkForm" onsubmit="handleProdukFormSubmit(event)" class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-300 uppercase mb-1">Tanggal</label>
-                                <input type="date" id="inputTanggalProduk" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                        <form id="produkForm" onsubmit="handleProdukFormSubmit(event)" class="space-y-4">
+                            <input type="hidden" id="editProdukId" value="">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Bulan</label>
+                                    <select id="inputBulanProduk" onchange="loadSelectedProdukMonthData()" class="w-full p-3 rounded-xl input-luxury text-xs font-extrabold focus:outline-none" required></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Tahun</label>
+                                    <select id="inputTahunProduk" onchange="loadSelectedProdukMonthData()" class="w-full p-3 rounded-xl input-luxury text-xs font-extrabold focus:outline-none" required></select>
+                                </div>
                             </div>
-
                             <div>
-                                <label class="block text-xs text-gray-300 mb-1 flex items-center gap-1">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span> RDF Curah (Ton)
+                                <label class="block text-xs text-slate-200 dark:text-slate-200 mb-1 flex items-center gap-1.5 font-black">
+                                    <span class="w-3 h-3 rounded-full bg-cyan-400"></span> RDF Curah (Ton)
                                 </label>
-                                <input type="number" step="0.01" min="0" id="inputRdfCurah" placeholder="0.00" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                                <input type="number" step="0.01" min="0" id="inputRdfCurah" placeholder="0.00" class="w-full p-3 rounded-xl input-luxury text-sm font-black focus:outline-none" required>
                             </div>
-
                             <div>
-                                <label class="block text-xs text-gray-300 mb-1 flex items-center gap-1">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span> Indocement (Ton)
+                                <label class="block text-xs text-slate-200 dark:text-slate-200 mb-1 flex items-center gap-1.5 font-black">
+                                    <span class="w-3 h-3 rounded-full bg-indigo-400"></span> Indocement (Ton)
                                 </label>
-                                <input type="number" step="0.01" min="0" id="inputIndocement" placeholder="0.00" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                                <input type="number" step="0.01" min="0" id="inputIndocement" placeholder="0.00" class="w-full p-3 rounded-xl input-luxury text-sm font-black focus:outline-none" required>
                             </div>
-
-                            <!-- Live Preview RDF Terkirim -->
-                            <div class="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-500/30 flex justify-between items-center text-xs">
-                                <span class="text-cyan-400 font-semibold">Total Terkirim:</span>
-                                <span class="text-sm font-extrabold text-cyan-300" id="previewTotalRdf">0.00 Ton</span>
+                            <div class="p-3.5 rounded-xl bg-cyan-950 border-2 border-cyan-500/50 flex justify-between items-center text-xs shadow-inner">
+                                <span class="text-cyan-300 font-extrabold">Total Terkirim:</span>
+                                <span class="text-base font-black text-cyan-200" id="previewTotalRdf">0.00 Ton</span>
                             </div>
-
                             <div>
-                                <label class="block text-xs text-gray-300 mb-1 flex items-center gap-1">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Residu (Ton)
+                                <label class="block text-xs text-slate-200 dark:text-slate-200 mb-1 flex items-center gap-1.5 font-black">
+                                    <span class="w-3 h-3 rounded-full bg-amber-400"></span> Residu (Ton)
                                 </label>
-                                <input type="number" step="0.01" min="0" id="inputResidu" placeholder="0.00" class="w-full p-2.5 rounded-xl input-3d text-xs focus:outline-none" required>
+                                <input type="number" step="0.01" min="0" id="inputResidu" placeholder="0.00" class="w-full p-3 rounded-xl input-luxury text-sm font-black focus:outline-none" required>
                             </div>
-
-                            <button type="submit" class="w-full py-2.5 px-4 rounded-xl btn-3d-emerald font-bold text-white text-xs tracking-wide flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-arrows-rotate"></i> Update Produk
-                            </button>
+                            <div class="flex gap-2 pt-1">
+                                <button type="submit" id="btnSubmitProduk" class="flex-1 py-3.5 px-4 rounded-xl btn-luxury-emerald font-black text-white text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-md">
+                                    <i class="fa-solid fa-floppy-disk"></i> Simpan Data
+                                </button>
+                                <button type="button" onclick="cancelEditProduk()" id="btnCancelProduk" class="hidden px-4 py-3.5 rounded-xl bg-slate-800 text-slate-200 text-xs font-bold hover:bg-slate-700 transition cursor-pointer shadow-md">Batal</button>
+                            </div>
                         </form>
                     </div>
+
+                    <!-- FORM 3: Input Produk Lainnya (BARU) -->
+                    <div class="pt-6 border-t border-slate-700">
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-700">
+                            <h3 class="text-base font-black flex items-center gap-2 text-white dark:text-white">
+                                <i class="fa-solid fa-box-open text-purple-400"></i> Form Produk Lainnya
+                            </h3>
+                            <span class="text-xs font-black px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400">Manual</span>
+                        </div>
+
+                        <form id="lainnyaForm" onsubmit="handleLainnyaFormSubmit(event)" class="space-y-4">
+                            <input type="hidden" id="editLainnyaId" value="">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Bulan</label>
+                                    <select id="inputBulanLainnya" class="w-full p-3 rounded-xl input-luxury text-xs font-extrabold focus:outline-none" required></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Tahun</label>
+                                    <select id="inputTahunLainnya" class="w-full p-3 rounded-xl input-luxury text-xs font-extrabold focus:outline-none" required></select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Jenis Produk</label>
+                                <input type="text" id="inputJenisProdukLainnya" placeholder="Contoh: Logam, Plastik PET" class="w-full p-3 rounded-xl input-luxury text-sm font-black focus:outline-none" required>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Tonase (Ton)</label>
+                                    <input type="number" step="0.01" min="0" id="inputTonaseLainnya" placeholder="0.00" class="w-full p-3 rounded-xl input-luxury text-sm font-black focus:outline-none" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-black text-slate-200 dark:text-slate-200 uppercase tracking-wider mb-1">Ritase</label>
+                                    <input type="number" step="1" min="0" id="inputRitaseLainnya" placeholder="0" class="w-full p-3 rounded-xl input-luxury text-sm font-black focus:outline-none" required>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-2 pt-1">
+                                <button type="submit" id="btnSubmitLainnya" class="flex-1 py-3.5 px-4 rounded-xl btn-luxury-purple font-black text-white text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-md">
+                                    <i class="fa-solid fa-plus"></i> Tambah Produk
+                                </button>
+                                <button type="button" onclick="cancelEditLainnya()" id="btnCancelLainnya" class="hidden px-4 py-3.5 rounded-xl bg-slate-800 text-slate-200 text-xs font-bold hover:bg-slate-700 transition cursor-pointer shadow-md">Batal</button>
+                            </div>
+                        </form>
+                    </div>
+
                 </div>
 
-                <!-- Data Table Column -->
-                <div class="glass-card-3d p-6 lg:col-span-2 flex flex-col justify-between border-t-2 border-indigo-500">
+                <!-- DATA TABLE LOG COLUMN -->
+                <div class="glass-card p-6 rounded-2xl lg:col-span-2 flex flex-col gap-8 border-t-4 border-indigo-500">
+                    
+                    <!-- TABEL SAMPAH MASUK -->
                     <div>
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                             <div>
-                                <h3 class="text-lg font-bold flex items-center gap-2">
-                                    <i class="fa-solid fa-table text-indigo-400"></i> Detail Log Tonase Masuk
+                                <h3 class="text-base font-black flex items-center gap-2 text-white dark:text-white">
+                                    <i class="fa-solid fa-table text-indigo-400"></i> Log Entry Sampah Masuk
                                 </h3>
-                                <p class="text-xs text-gray-400">Rincian entry tonase berdasarkan tanggal</p>
+                                <p class="text-xs font-bold text-slate-300 dark:text-slate-300">Rincian akumulasi tonase sampah per bulan evaluasi</p>
                             </div>
-                            <div class="w-full sm:w-auto flex gap-2">
-                                <input type="text" id="searchTable" oninput="renderTable()" placeholder="Cari kecamatan/wilayah..." class="px-3 py-1.5 rounded-lg input-3d text-xs focus:outline-none w-full sm:w-48">
+                            <div class="w-full sm:w-auto flex items-center gap-2 no-export">
+                                <input type="text" id="searchTable" oninput="renderTable()" placeholder="Cari kecamatan / bulan..." class="px-3.5 py-2.5 rounded-xl input-luxury text-xs focus:outline-none w-full sm:w-52">
+                                <button onclick="exportTableToPDF()" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-black transition flex items-center gap-2 whitespace-nowrap shadow-md cursor-pointer">
+                                    <i class="fa-solid fa-file-pdf"></i> Unduh PDF
+                                </button>
                             </div>
                         </div>
 
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto rounded-xl border-2 border-slate-700 shadow-inner">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-900/60 text-gray-400 uppercase border-b border-gray-800">
-                                        <th class="p-3">Tanggal</th>
-                                        <th class="p-3">Wilayah</th>
-                                        <th class="p-3">Kecamatan</th>
-                                        <th class="p-3 text-right">Tonase (T)</th>
-                                        <th class="p-3 text-center">Aksi</th>
+                                    <tr class="bg-slate-900 text-slate-200 uppercase text-xs tracking-wider border-b-2 border-slate-700 font-black">
+                                        <th class="p-3.5">Periode Bulan</th>
+                                        <th class="p-3.5">Wilayah</th>
+                                        <th class="p-3.5">Kecamatan</th>
+                                        <th class="p-3.5 text-right">Tonase (Ton)</th>
+                                        <th class="p-3.5 text-center no-export">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="dataTableBody" class="divide-y divide-gray-800/60 font-medium">
-                                    <!-- Dynamic Rows -->
+                                <tbody id="dataTableBody" class="divide-y divide-slate-700/80 font-bold">
+                                    <!-- Dynamic Table Rows -->
                                 </tbody>
                             </table>
                         </div>
+                        <div class="mt-2 text-xs text-slate-300 font-extrabold text-right">
+                            <span id="rowCount">Showing 0 entries</span>
+                        </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-t border-gray-800 flex justify-between items-center text-xs text-gray-400">
-                        <span id="rowCount">Showing 0 entries</span>
-                        <span><i class="fa-solid fa-database text-indigo-400"></i> Disimpan di Local Browser</span>
+                    <!-- TABEL HASIL PENGOLAHAN (BARU) -->
+                    <div class="pt-6 border-t border-slate-700">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                            <div>
+                                <h3 class="text-base font-black flex items-center gap-2 text-white dark:text-white">
+                                    <i class="fa-solid fa-industry text-emerald-400"></i> Log Entry Hasil Pengolahan
+                                </h3>
+                                <p class="text-xs font-bold text-slate-300 dark:text-slate-300">Riwayat produksi RDF dan Residu per bulan</p>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-xl border-2 border-emerald-500/40 shadow-inner">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-900 text-slate-200 uppercase text-xs tracking-wider border-b-2 border-emerald-500/40 font-black">
+                                        <th class="p-3.5">Periode</th>
+                                        <th class="p-3.5 text-right">RDF Curah</th>
+                                        <th class="p-3.5 text-right">Indocement</th>
+                                        <th class="p-3.5 text-right">Residu</th>
+                                        <th class="p-3.5 text-center no-export">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataTableProdukBody" class="divide-y divide-slate-700/80 font-bold">
+                                    <!-- Dynamic Table Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-2 text-xs text-slate-300 font-extrabold flex justify-between">
+                            <span></span>
+                            <span id="rowCountProduk">Showing 0 entries</span>
+                        </div>
                     </div>
+
+                    <!-- TABEL PRODUK LAINNYA (BARU) -->
+                    <div class="pt-6 border-t border-slate-700">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                            <div>
+                                <h3 class="text-base font-black flex items-center gap-2 text-white dark:text-white">
+                                    <i class="fa-solid fa-boxes-stacked text-purple-400"></i> Log Entry Produk Lainnya
+                                </h3>
+                                <p class="text-xs font-bold text-slate-300 dark:text-slate-300">Riwayat pengeluaran produk selain RDF dan Residu</p>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-xl border-2 border-purple-500/40 shadow-inner">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-900 text-slate-200 uppercase text-xs tracking-wider border-b-2 border-purple-500/40 font-black">
+                                        <th class="p-3.5">Periode</th>
+                                        <th class="p-3.5">Jenis Produk</th>
+                                        <th class="p-3.5 text-right">Tonase (Ton)</th>
+                                        <th class="p-3.5 text-right">Ritase</th>
+                                        <th class="p-3.5 text-center no-export">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataTableLainnyaBody" class="divide-y divide-slate-700/80 font-bold">
+                                    <!-- Dynamic Table Rows for Lainnya -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-2 text-xs text-slate-300 font-extrabold flex justify-between">
+                             <span class="flex items-center gap-1.5"><i class="fa-solid fa-database text-indigo-400"></i> Data tersimpan di Browser</span>
+                            <span id="rowCountLainnya">Showing 0 entries</span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Confirmation Modal Component -->
-    <div id="customModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="glass-card-3d p-6 max-w-sm w-full text-center space-y-4">
-            <div class="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center mx-auto text-xl">
+    <!-- Custom Modal -->
+    <div id="customModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center z-[110] p-4">
+        <div class="glass-card p-6 max-w-sm w-full text-center space-y-4 rounded-2xl border-2 border-rose-500/50 shadow-2xl">
+            <div class="w-14 h-14 rounded-2xl bg-rose-500/20 border-2 border-rose-500 text-rose-300 flex items-center justify-center mx-auto text-2xl">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <h3 class="text-lg font-bold text-white" id="modalTitle">Konfirmasi</h3>
-            <p class="text-xs text-gray-300" id="modalMessage">Apakah Anda yakin ingin melanjutkan?</p>
+            <h3 class="text-lg font-black text-white" id="modalTitle">Konfirmasi</h3>
+            <p class="text-xs text-slate-200 font-bold" id="modalMessage">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
             <div class="flex gap-3 pt-2">
-                <button id="modalBtnCancel" class="flex-1 py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-gray-300 text-xs font-bold transition">Batal</button>
-                <button id="modalBtnConfirm" class="flex-1 py-2 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition">Lanjutkan</button>
+                <button id="modalBtnCancel" class="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-black transition cursor-pointer">Batal</button>
+                <button id="modalBtnConfirm" class="flex-1 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-black transition cursor-pointer">Lanjutkan</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Master definition of Regions and Sub-districts
+        const NAMA_BULAN = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+
         const MASTER_WILAYAH = {
             "Jakarta Utara": ["Cilincing", "Kelapa Gading", "Koja", "Tanjung Priok", "Pademangan", "Penjaringan"],
             "Jakarta Timur": ["Cakung", "Pulogadung", "Duren Sawit", "Jatinegara", "Matraman", "Makasar"],
@@ -508,85 +765,192 @@
             "UPST": ["UPST Direct"]
         };
 
-        function getTodayString() {
-            const today = new Date();
-            return today.toISOString().split('T')[0];
+        const WILAYAH_COLORS = {
+            "Jakarta Utara": { hex: "#22c55e", twBg: "bg-green-500", twText: "text-green-400", rowBg: "bg-green-950/40 border-l-4 border-green-500" },
+            "Jakarta Timur": { hex: "#3b82f6", twBg: "bg-blue-500", twText: "text-blue-400", rowBg: "bg-blue-950/40 border-l-4 border-blue-500" },
+            "Jakarta Pusat": { hex: "#eab308", twBg: "bg-yellow-500", twText: "text-yellow-400", rowBg: "bg-yellow-950/40 border-l-4 border-yellow-500" },
+            "Jakarta Selatan": { hex: "#ec4899", twBg: "bg-pink-500", twText: "text-pink-400", rowBg: "bg-pink-950/40 border-l-4 border-pink-500" },
+            "Jakarta Barat": { hex: "#a855f7", twBg: "bg-purple-500", twText: "text-purple-400", rowBg: "bg-purple-950/40 border-l-4 border-purple-500" },
+            "Kepulauan Seribu": { hex: "#06b6d4", twBg: "bg-cyan-500", twText: "text-cyan-400", rowBg: "bg-cyan-950/40 border-l-4 border-cyan-500" },
+            "UPST": { hex: "#f97316", twBg: "bg-orange-500", twText: "text-orange-400", rowBg: "bg-orange-950/40 border-l-4 border-orange-500" }
+        };
+
+        function makeMonthKey(bulanIdx, tahun) {
+            const b = String(parseInt(bulanIdx) + 1).padStart(2, '0');
+            return `${tahun}-${b}`;
         }
 
-        // Default Sample Data
+        function formatMonthLabel(monthKey) {
+            if (!monthKey) return "-";
+            const parts = monthKey.split('-');
+            if (parts.length < 2) return monthKey;
+            const bIdx = parseInt(parts[1], 10) - 1;
+            const year = parts[0];
+            return `${NAMA_BULAN[bIdx]} ${year}`;
+        }
+
+        const CURRENT_YEAR = new Date().getFullYear();
+        const CURRENT_MONTH_IDX = new Date().getMonth();
+
+        // Data Examples Fallback
         const DEFAULT_SAMPAH_MASUK = [
-            { id: "1", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Cilincing", tonaseMasuk: 280.5 },
-            { id: "2", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Kelapa Gading", tonaseMasuk: 195.0 },
-            { id: "3", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Koja", tonaseMasuk: 220.0 },
-            { id: "4", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Tanjung Priok", tonaseMasuk: 310.0 },
-            { id: "5", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Pademangan", tonaseMasuk: 155.0 },
-            { id: "6", tanggal: getTodayString(), wilayah: "Jakarta Utara", kecamatan: "Penjaringan", tonaseMasuk: 260.0 },
-            { id: "7", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Cakung", tonaseMasuk: 340.0 },
-            { id: "8", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Pulogadung", tonaseMasuk: 240.0 },
-            { id: "9", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Duren Sawit", tonaseMasuk: 215.0 },
-            { id: "10", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Jatinegara", tonaseMasuk: 200.0 },
-            { id: "11", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Matraman", tonaseMasuk: 135.0 },
-            { id: "12", tanggal: getTodayString(), wilayah: "Jakarta Timur", kecamatan: "Makasar", tonaseMasuk: 175.0 },
-            { id: "13", tanggal: getTodayString(), wilayah: "Jakarta Pusat", kecamatan: "Cempaka Putih", tonaseMasuk: 125.0 },
-            { id: "14", tanggal: getTodayString(), wilayah: "Jakarta Pusat", kecamatan: "Kemayoran", tonaseMasuk: 220.0 },
-            { id: "15", tanggal: getTodayString(), wilayah: "Jakarta Pusat", kecamatan: "Johar Baru", tonaseMasuk: 105.0 },
-            { id: "16", tanggal: getTodayString(), wilayah: "Jakarta Pusat", kecamatan: "Senen", tonaseMasuk: 165.0 },
-            { id: "17", tanggal: getTodayString(), wilayah: "Jakarta Pusat", kecamatan: "Gambir", tonaseMasuk: 145.0 },
-            { id: "18", tanggal: getTodayString(), wilayah: "Jakarta Barat", kecamatan: "Tambora", tonaseMasuk: 230.0 },
-            { id: "19", tanggal: getTodayString(), wilayah: "Jakarta Barat", kecamatan: "Cengkareng", tonaseMasuk: 320.0 },
-            { id: "20", tanggal: getTodayString(), wilayah: "Jakarta Barat", kecamatan: "Taman Sari", tonaseMasuk: 150.0 },
-            { id: "21", tanggal: getTodayString(), wilayah: "Jakarta Selatan", kecamatan: "Pasar Minggu", tonaseMasuk: 250.0 },
-            { id: "22", tanggal: getTodayString(), wilayah: "Kepulauan Seribu", kecamatan: "Kepulauan Seribu Direct", tonaseMasuk: 45.0 },
-            { id: "23", tanggal: getTodayString(), wilayah: "UPST", kecamatan: "UPST Direct", tonaseMasuk: 425.0 }
+            { id: "1", periode: `${CURRENT_YEAR}-01`, wilayah: "Jakarta Utara", kecamatan: "Cilincing", tonaseMasuk: 8410.5 },
+            { id: "2", periode: `${CURRENT_YEAR}-01`, wilayah: "Jakarta Utara", kecamatan: "Kelapa Gading", tonaseMasuk: 5850.0 },
+            { id: "3", periode: `${CURRENT_YEAR}-01`, wilayah: "Jakarta Timur", kecamatan: "Cakung", tonaseMasuk: 10200.0 },
+            { id: "4", periode: `${CURRENT_YEAR}-01`, wilayah: "Jakarta Pusat", kecamatan: "Cempaka Putih", tonaseMasuk: 3750.0 },
+            { id: "5", periode: `${CURRENT_YEAR}-01`, wilayah: "Jakarta Barat", kecamatan: "Tambora", tonaseMasuk: 6900.0 },
+            { id: "6", periode: `${CURRENT_YEAR}-01`, wilayah: "Jakarta Selatan", kecamatan: "Pasar Minggu", tonaseMasuk: 7500.0 },
+            { id: "7", periode: `${CURRENT_YEAR}-01`, wilayah: "Kepulauan Seribu", kecamatan: "Kepulauan Seribu Direct", tonaseMasuk: 1350.0 },
+            { id: "8", periode: `${CURRENT_YEAR}-01`, wilayah: "UPST", kecamatan: "UPST Direct", tonaseMasuk: 12750.0 }
         ];
 
         const DEFAULT_PRODUK = [
-            { id: "p1", tanggal: getTodayString(), rdfCurah: 2450.0, indocement: 1820.0, residu: 410.0 }
+            { id: "p1", periode: `${CURRENT_YEAR}-01`, rdfCurah: 28500.0, indocement: 21800.0, residu: 4900.0 }
         ];
 
-        // Global State variables
+        const DEFAULT_LAINNYA = [
+            { id: "l1", periode: `${CURRENT_YEAR}-01`, jenisProduk: "Besi/Logam", tonase: 14.5, ritase: 3 },
+            { id: "l2", periode: `${CURRENT_YEAR}-01`, jenisProduk: "Plastik PET", tonase: 8.2, ritase: 2 }
+        ];
+
         let dataSampah = [];
         let dataProduk = [];
+        let dataLainnya = [];
         let currentTheme = 'dark';
-        
-        // Define placeholders for 3D objects to prevent ReferenceErrors if called
-        window.bar3D = { scene: null, camera: null, renderer: null, bars: [], animationId: null };
-        window.donut3D = { scene: null, camera: null, renderer: null, meshGroup: null, animationId: null };
+        let firebaseDatabase = null;
+        let firebaseRootRef = null;
+
+        function initializeFirebaseRealtimeDatabase() {
+            if (!window.db || !window.firebaseDatabase) {
+                console.warn("Firebase belum siap. Menunggu inisialisasi...");
+                return;
+            }
+
+            firebaseDatabase = window.firebaseDatabase;
+            firebaseRootRef = firebaseDatabase.ref(window.db, '/');
+
+            firebaseDatabase.onValue(firebaseRootRef, (snapshot) => {
+                const data = snapshot.val() || {};
+                dataSampah = data.sampah || dataSampah;
+                dataProduk = data.produk || dataProduk;
+                dataLainnya = data.lainnya || dataLainnya;
+
+                saveData();
+                loadSelectedProdukMonthData();
+                refreshDashboard();
+            });
+        }
+
+        function checkLoginStatus() {
+            const isLoggedIn = sessionStorage.getItem('rdf_logged_in');
+            const loginScreen = document.getElementById('loginScreen');
+            const dashboard = document.getElementById('dashboardCaptureArea');
+            
+            if (isLoggedIn === 'true') {
+                loginScreen.style.display = 'none';
+                dashboard.classList.remove('hidden');
+                dashboard.classList.add('flex');
+            } else {
+                dashboard.classList.add('hidden');
+                dashboard.classList.remove('flex');
+                loginScreen.style.display = 'flex';
+                loginScreen.style.opacity = '1';
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const user = document.getElementById('loginUsername').value;
+            const pass = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            const loginBtn = document.getElementById('loginBtn');
+
+            if (user === 'AdminJT18' && pass === 'Upst123!@#') {
+                errorDiv.classList.add('hidden');
+                loginBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Memverifikasi...';
+                loginBtn.disabled = true;
+                
+                setTimeout(() => {
+                    sessionStorage.setItem('rdf_logged_in', 'true');
+                    const loginScreen = document.getElementById('loginScreen');
+                    const dashboard = document.getElementById('dashboardCaptureArea');
+                    
+                    loginScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loginScreen.style.display = 'none';
+                        dashboard.classList.remove('hidden');
+                        dashboard.classList.add('flex');
+                        refreshDashboard();
+                        
+                        loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Masuk Executive Dashboard';
+                        loginBtn.disabled = false;
+                        document.getElementById('loginPassword').value = '';
+                    }, 400);
+                }, 600); 
+            } else {
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            showModal("Konfirmasi Keluar", "Apakah Anda yakin ingin keluar dari executive dashboard?", function() {
+                sessionStorage.removeItem('rdf_logged_in');
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
+                checkLoginStatus();
+            });
+        }
+
+        function populateMonthAndYearDropdowns() {
+            const monthDropdowns = ['filterStartMonth', 'filterEndMonth', 'inputBulanSampah', 'inputBulanProduk', 'inputBulanLainnya'];
+            const yearDropdowns = ['filterStartYear', 'filterEndYear', 'inputTahunSampah', 'inputTahunProduk', 'inputTahunLainnya'];
+
+            monthDropdowns.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = '';
+                NAMA_BULAN.forEach((bulan, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.textContent = bulan;
+                    el.appendChild(opt);
+                });
+            });
+
+            const startY = CURRENT_YEAR - 3;
+            const endY = CURRENT_YEAR + 3;
+            yearDropdowns.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = '';
+                for (let y = startY; y <= endY; y++) {
+                    const opt = document.createElement('option');
+                    opt.value = y;
+                    opt.textContent = y;
+                    el.appendChild(opt);
+                }
+            });
+
+            document.getElementById('filterStartMonth').value = 0;
+            document.getElementById('filterStartYear').value = CURRENT_YEAR;
+            document.getElementById('filterEndMonth').value = CURRENT_MONTH_IDX;
+            document.getElementById('filterEndYear').value = CURRENT_YEAR;
+
+            ['inputBulanSampah', 'inputBulanProduk', 'inputBulanLainnya'].forEach(id => document.getElementById(id).value = CURRENT_MONTH_IDX);
+            ['inputTahunSampah', 'inputTahunProduk', 'inputTahunLainnya'].forEach(id => document.getElementById(id).value = CURRENT_YEAR);
+        }
 
         window.onload = function() {
-            document.getElementById('inputTanggalSampah').value = getTodayString();
-            document.getElementById('inputTanggalProduk').value = getTodayString();
-
+            checkLoginStatus();
+            populateMonthAndYearDropdowns();
             loadSavedLogo();
+            initializeFirebaseRealtimeDatabase();
             loadData();
             updateKecamatanDropdown();
             setupProdukFormListeners();
-
             refreshDashboard();
-
-            // Responsive Canvas listener
             window.addEventListener('resize', refreshDashboard);
         };
-
-        function handleLogoUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const logoDataUrl = e.target.result;
-                    document.getElementById('appLogo').src = logoDataUrl;
-                    localStorage.setItem('rdf_jakarta_custom_logo', logoDataUrl);
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function loadSavedLogo() {
-            const savedLogo = localStorage.getItem('rdf_jakarta_custom_logo');
-            if (savedLogo) {
-                document.getElementById('appLogo').src = savedLogo;
-            }
-        }
 
         function toggleTheme() {
             const body = document.body;
@@ -599,66 +963,87 @@
                 body.classList.remove('dark');
                 body.classList.add('light');
                 html.classList.remove('dark');
-                themeIcon.className = 'fa-solid fa-moon text-indigo-600';
+                themeIcon.className = 'fa-solid fa-moon text-indigo-600 text-sm';
                 themeLabel.textContent = 'Mode Gelap';
             } else {
                 currentTheme = 'dark';
                 body.classList.remove('light');
                 body.classList.add('dark');
                 html.classList.add('dark');
-                themeIcon.className = 'fa-solid fa-sun text-amber-400';
+                themeIcon.className = 'fa-solid fa-sun text-amber-400 text-sm';
                 themeLabel.textContent = 'Mode Terang';
             }
             refreshDashboard();
         }
 
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const logoUrl = e.target.result;
+                    document.getElementById('appLogo').src = logoUrl;
+                    document.getElementById('loginLogo').src = logoUrl;
+                    localStorage.setItem('rdf_jakarta_custom_logo', logoUrl);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function loadSavedLogo() {
+            const savedLogo = localStorage.getItem('rdf_jakarta_custom_logo');
+            if (savedLogo) { 
+                document.getElementById('appLogo').src = savedLogo; 
+                document.getElementById('loginLogo').src = savedLogo; 
+            }
+        }
+
         function loadData() {
-            const storedSampah = localStorage.getItem('rdf_jakarta_sampah_v3');
-            const storedProduk = localStorage.getItem('rdf_jakarta_produk_v3');
+            // Menggunakan versi 7 agar bersih dari cache konflik data lama
+            const storedSampah = localStorage.getItem('rdf_jakarta_sampah_v7');
+            const storedProduk = localStorage.getItem('rdf_jakarta_produk_v7');
+            const storedLainnya = localStorage.getItem('rdf_jakarta_lainnya_v7');
 
-            if (storedSampah) {
-                try { dataSampah = JSON.parse(storedSampah); } catch(e) { dataSampah = [...DEFAULT_SAMPAH_MASUK]; }
-            } else {
-                dataSampah = JSON.parse(JSON.stringify(DEFAULT_SAMPAH_MASUK));
-            }
+            dataSampah = storedSampah ? JSON.parse(storedSampah) : JSON.parse(JSON.stringify(DEFAULT_SAMPAH_MASUK));
+            dataProduk = storedProduk ? JSON.parse(storedProduk) : JSON.parse(JSON.stringify(DEFAULT_PRODUK));
+            dataLainnya = storedLainnya ? JSON.parse(storedLainnya) : JSON.parse(JSON.stringify(DEFAULT_LAINNYA));
 
-            if (storedProduk) {
-                try { dataProduk = JSON.parse(storedProduk); } catch(e) { dataProduk = [...DEFAULT_PRODUK]; }
-            } else {
-                dataProduk = JSON.parse(JSON.stringify(DEFAULT_PRODUK));
-            }
-
-            const todayProd = dataProduk.find(p => p.tanggal === getTodayString()) || dataProduk[0] || { rdfCurah: 0, indocement: 0, residu: 0 };
-            document.getElementById('inputRdfCurah').value = todayProd.rdfCurah;
-            document.getElementById('inputIndocement').value = todayProd.indocement;
-            document.getElementById('inputResidu').value = todayProd.residu;
-            updateRdfPreview();
+            loadSelectedProdukMonthData();
         }
 
         function saveData() {
-            localStorage.setItem('rdf_jakarta_sampah_v3', JSON.stringify(dataSampah));
-            localStorage.setItem('rdf_jakarta_produk_v3', JSON.stringify(dataProduk));
+            localStorage.setItem('rdf_jakarta_sampah_v7', JSON.stringify(dataSampah));
+            localStorage.setItem('rdf_jakarta_produk_v7', JSON.stringify(dataProduk));
+            localStorage.setItem('rdf_jakarta_lainnya_v7', JSON.stringify(dataLainnya));
+
+            if (!window.db || !window.firebaseDatabase) {
+                console.warn("Firebase belum siap, menyimpan hanya di localStorage.");
+                return;
+            }
+
+            const rootRef = firebaseRootRef || window.firebaseDatabase.ref(window.db, '/');
+            window.firebaseDatabase.set(rootRef, {
+                sampah: dataSampah,
+                produk: dataProduk,
+                lainnya: dataLainnya
+            }).catch((error) => {
+                console.error("Firebase save error:", error);
+            });
         }
 
         function resetData() {
             showModal(
                 "Hapus Semua Data",
-                "Apakah Anda yakin ingin menghapus seluruh data? Semua data tonase masuk dan produk akan dikosongkan (menjadi 0) secara permanen.",
+                "Apakah Anda yakin ingin menghapus seluruh log bulanan? Data akan dikosongkan secara permanen.",
                 function() {
-                    // Kosongkan array data
                     dataSampah = [];
                     dataProduk = [];
-                    
-                    // Reset input form produk ke 0/kosong
+                    dataLainnya = [];
                     document.getElementById('inputRdfCurah').value = '';
                     document.getElementById('inputIndocement').value = '';
                     document.getElementById('inputResidu').value = '';
                     updateRdfPreview();
-                    
-                    // Simpan state kosong dan muat ulang dashboard
                     saveData();
-                    loadData();
-                    resetDateFilter();
                     refreshDashboard();
                 }
             );
@@ -671,25 +1056,235 @@
             modal.classList.remove('hidden');
             modal.classList.add('flex');
 
-            const btnConfirm = document.getElementById('modalBtnConfirm');
-            const btnCancel = document.getElementById('modalBtnCancel');
-
             const cleanup = () => {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
-                btnConfirm.onclick = null;
-                btnCancel.onclick = null;
             };
 
-            btnConfirm.onclick = () => { cleanup(); onConfirm(); };
-            btnCancel.onclick = () => { cleanup(); };
+            document.getElementById('modalBtnConfirm').onclick = () => { cleanup(); onConfirm(); };
+            document.getElementById('modalBtnCancel').onclick = () => { cleanup(); };
+        }
+
+        function getFilteredData() {
+            const startBulan = document.getElementById('filterStartMonth').value;
+            const startTahun = document.getElementById('filterStartYear').value;
+            const endBulan = document.getElementById('filterEndMonth').value;
+            const endTahun = document.getElementById('filterEndYear').value;
+
+            const startKey = makeMonthKey(startBulan, startTahun);
+            const endKey = makeMonthKey(endBulan, endTahun);
+
+            // Filter aman untuk memastikan properti 'periode' ada
+            const filteredSampah = dataSampah.filter(item => (!item.periode || (item.periode >= startKey && item.periode <= endKey)));
+            const filteredProduk = dataProduk.filter(item => (!item.periode || (item.periode >= startKey && item.periode <= endKey)));
+            const filteredLainnya = dataLainnya.filter(item => (!item.periode || (item.periode >= startKey && item.periode <= endKey)));
+
+            return { filteredSampah, filteredProduk, filteredLainnya };
+        }
+
+        function applyDateFilter() { refreshDashboard(); }
+
+        function setFilterPreset(preset) {
+            if (preset === 'thisYear') {
+                document.getElementById('filterStartMonth').value = 0;
+                document.getElementById('filterStartYear').value = CURRENT_YEAR;
+                document.getElementById('filterEndMonth').value = 11;
+                document.getElementById('filterEndYear').value = CURRENT_YEAR;
+            } else if (preset === 'last3') {
+                let startIdx = CURRENT_MONTH_IDX - 2;
+                let startY = CURRENT_YEAR;
+                if (startIdx < 0) { startIdx += 12; startY -= 1; }
+                document.getElementById('filterStartMonth').value = startIdx;
+                document.getElementById('filterStartYear').value = startY;
+                document.getElementById('filterEndMonth').value = CURRENT_MONTH_IDX;
+                document.getElementById('filterEndYear').value = CURRENT_YEAR;
+            }
+            refreshDashboard();
+        }
+        
+        function resetDateFilter() {
+            document.getElementById('filterStartMonth').value = 0;
+            document.getElementById('filterStartYear').value = CURRENT_YEAR - 2;
+            document.getElementById('filterEndMonth').value = 11;
+            document.getElementById('filterEndYear').value = CURRENT_YEAR + 1;
+            refreshDashboard();
+        }
+
+        function calculateSummary() {
+            const { filteredSampah, filteredProduk, filteredLainnya } = getFilteredData();
+            
+            // Stats Sampah
+            const summaryByWilayah = {};
+            const summaryByKecamatan = {};
+            Object.keys(MASTER_WILAYAH).forEach(w => {
+                summaryByWilayah[w] = { tonaseMasuk: 0, count: 0 };
+                MASTER_WILAYAH[w].forEach(k => summaryByKecamatan[k] = 0);
+            });
+
+            let grandTotalSampah = 0;
+            filteredSampah.forEach(item => {
+                const w = item.wilayah;
+                const k = item.kecamatan;
+                const tonase = item.tonaseMasuk || 0;
+                if (!summaryByWilayah[w]) summaryByWilayah[w] = { tonaseMasuk: 0, count: 0 };
+                summaryByWilayah[w].tonaseMasuk += tonase;
+                summaryByWilayah[w].count += 1;
+                if (summaryByKecamatan[k] === undefined) summaryByKecamatan[k] = 0;
+                summaryByKecamatan[k] += tonase;
+                grandTotalSampah += tonase;
+            });
+
+            // Stats Produk Utama
+            let sumRdfCurah = 0, sumIndocement = 0, sumResidu = 0;
+            filteredProduk.forEach(p => {
+                sumRdfCurah += p.rdfCurah || 0;
+                sumIndocement += p.indocement || 0;
+                sumResidu += p.residu || 0;
+            });
+            const rdfTerkirim = sumRdfCurah + sumIndocement;
+            const totalTerolah = rdfTerkirim + sumResidu;
+            const rasioTerolah = grandTotalSampah > 0 ? ((totalTerolah / grandTotalSampah) * 100).toFixed(1) : 0;
+
+            // Stats Produk Lainnya
+            let totalTonaseLainnya = 0, totalRitaseLainnya = 0;
+            const summaryLainnyaByProduk = {};
+            filteredLainnya.forEach(item => {
+                const jns = item.jenisProduk || "Tidak Diketahui";
+                totalTonaseLainnya += item.tonase || 0;
+                totalRitaseLainnya += item.ritase || 0;
+                if (!summaryLainnyaByProduk[jns]) summaryLainnyaByProduk[jns] = { tonase: 0, ritase: 0 };
+                summaryLainnyaByProduk[jns].tonase += item.tonase || 0;
+                summaryLainnyaByProduk[jns].ritase += item.ritase || 0;
+            });
+
+            return { 
+                summaryByWilayah, summaryByKecamatan, grandTotalSampah, 
+                sumRdfCurah, sumIndocement, sumResidu, rdfTerkirim, totalTerolah, rasioTerolah,
+                totalTonaseLainnya, totalRitaseLainnya, summaryLainnyaByProduk
+            };
+        }
+
+        function refreshDashboard() {
+            const stats = calculateSummary();
+            
+            // Top Cards
+            document.getElementById('stat-total-sampah').innerHTML = `${stats.grandTotalSampah.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-xs font-bold text-slate-300">Ton</span>`;
+            document.getElementById('stat-total-rdf').innerHTML = `${stats.rdfTerkirim.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-xs font-bold text-slate-300">Ton</span>`;
+            document.getElementById('stat-total-residu').innerHTML = `${stats.sumResidu.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-xs font-bold text-slate-300">Ton</span>`;
+            document.getElementById('stat-total-terolah').innerHTML = `${stats.totalTerolah.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-xs font-bold text-slate-300">Ton</span>`;
+            document.getElementById('stat-rasio-terolah').innerHTML = `Efisiensi Terolah: <span class="text-emerald-400 font-black">${stats.rasioTerolah}%</span> dari Suply`;
+
+            renderWilayahAndLainnyaCards(stats.summaryByWilayah, stats.summaryByKecamatan, stats.grandTotalSampah, stats.summaryLainnyaByProduk, stats.totalTonaseLainnya, stats.totalRitaseLainnya);
+            
+            renderTable();
+            renderProdukTable();
+            renderLainnyaTable();
+
+            drawBarChart2D(stats.summaryByWilayah, stats.grandTotalSampah);
+            drawDonutChart2D(stats.sumRdfCurah, stats.sumIndocement, stats.sumResidu, stats.totalTerolah);
+        }
+
+        function renderWilayahAndLainnyaCards(summaryMap, kecamatanMap, grandTotal, summaryLainnya, totalTonaseLainnya, totalRitaseLainnya) {
+            const container = document.getElementById('wilayah-cards-container');
+            let completeCardsHtml = '';
+
+            // Render Region Cards First
+            Object.keys(MASTER_WILAYAH).forEach(w => {
+                const dataWilayah = summaryMap[w] || { tonaseMasuk: 0, count: 0 };
+                const kontribusi = grandTotal > 0 ? ((dataWilayah.tonaseMasuk / grandTotal) * 100).toFixed(1) : 0;
+                const kecamatanList = MASTER_WILAYAH[w] || [];
+                const colorTheme = WILAYAH_COLORS[w];
+
+                let kecamatanListHtml = '';
+                kecamatanList.forEach(kec => {
+                    const tonaseKec = kecamatanMap[kec] || 0;
+                    const porsiKec = dataWilayah.tonaseMasuk > 0 ? ((tonaseKec / dataWilayah.tonaseMasuk) * 100) : 0;
+                    const displayName = kec.endsWith("Direct") ? "Input Langsung" : kec;
+
+                    kecamatanListHtml += `
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-200 dark:text-slate-200 font-extrabold truncate pr-2">${displayName}</span>
+                                <span class="font-black text-white dark:text-white shrink-0">${tonaseKec.toLocaleString('id-ID', {maximumFractionDigits:1})} Ton</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                                <div class="h-full ${colorTheme.twBg}" style="width: ${Math.min(porsiKec, 100)}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                completeCardsHtml += `
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between h-full relative overflow-hidden border-2 border-slate-700/60 transition hover:scale-[1.01]">
+                        <div class="absolute -right-4 -top-4 w-16 h-16 rounded-full opacity-20 ${colorTheme.twBg} blur-xl"></div>
+                        <div>
+                            <div class="flex items-center justify-between border-b-2 border-slate-700 pb-3 mb-3">
+                                <h3 class="font-black text-sm text-white dark:text-white">${w}</h3>
+                                <div class="text-right">
+                                    <div class="text-base font-black ${colorTheme.twText}">${dataWilayah.tonaseMasuk.toLocaleString('id-ID', {maximumFractionDigits:1})} Ton</div>
+                                    <div class="text-xs font-extrabold text-slate-300 dark:text-slate-300">${kontribusi}% Kontribusi</div>
+                                </div>
+                            </div>
+                            <div class="space-y-3 pt-1">
+                                ${kecamatanListHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Append "Produk Lainnya" Card at the end (next to UPST)
+            let listLainnyaHtml = '';
+            const produkKeys = Object.keys(summaryLainnya);
+            
+            if (produkKeys.length === 0) {
+                listLainnyaHtml = `<div class="text-xs text-slate-400 font-bold italic text-center py-4">Belum ada data periode ini</div>`;
+            } else {
+                produkKeys.forEach(jp => {
+                    const data = summaryLainnya[jp];
+                    const porsi = totalTonaseLainnya > 0 ? ((data.tonase / totalTonaseLainnya) * 100) : 0;
+                    listLainnyaHtml += `
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-200 dark:text-slate-200 font-extrabold truncate pr-2">${jp}</span>
+                                <span class="font-black text-purple-300 shrink-0">${data.tonase.toLocaleString('id-ID', {maximumFractionDigits:1})} T / ${data.ritase} Rit</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                                <div class="h-full bg-purple-500" style="width: ${Math.min(porsi, 100)}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            completeCardsHtml += `
+                <div class="glass-card p-5 rounded-2xl flex flex-col justify-between h-full relative overflow-hidden border-2 border-purple-500/40 transition hover:scale-[1.01]" style="background-image: linear-gradient(to bottom right, rgba(147, 51, 234, 0.05), transparent);">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 rounded-full opacity-20 bg-purple-500 blur-xl"></div>
+                    <div>
+                        <div class="flex items-center justify-between border-b-2 border-purple-900/50 pb-3 mb-3">
+                            <h3 class="font-black text-sm text-white dark:text-white flex items-center gap-2">
+                                <i class="fa-solid fa-box-open text-purple-400"></i> Sum. Lainnya
+                            </h3>
+                            <div class="text-right">
+                                <div class="text-base font-black text-purple-400">${totalTonaseLainnya.toLocaleString('id-ID', {maximumFractionDigits:1})} Ton</div>
+                                <div class="text-xs font-extrabold text-slate-300 dark:text-slate-300">Total ${totalRitaseLainnya} Ritase</div>
+                            </div>
+                        </div>
+                        <div class="space-y-3 pt-1">
+                            ${listLainnyaHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Apply all HTML at once to prevent layout rendering breaks
+            container.innerHTML = completeCardsHtml;
         }
 
         function updateKecamatanDropdown() {
             const selectedWilayah = document.getElementById('selectWilayah').value;
             const kecamatanSelect = document.getElementById('selectKecamatan');
             kecamatanSelect.innerHTML = '';
-
             const list = MASTER_WILAYAH[selectedWilayah] || [];
             list.forEach(kec => {
                 const opt = document.createElement('option');
@@ -697,6 +1292,30 @@
                 opt.textContent = kec.endsWith("Direct") ? "Input Langsung " + selectedWilayah : kec;
                 kecamatanSelect.appendChild(opt);
             });
+        }
+
+        function loadSelectedProdukMonthData() {
+            const bIdx = document.getElementById('inputBulanProduk').value;
+            const y = document.getElementById('inputTahunProduk').value;
+            const targetKey = makeMonthKey(bIdx, y);
+
+            const prod = dataProduk.find(p => p.periode === targetKey);
+            if (prod) {
+                document.getElementById('editProdukId').value = prod.id;
+                document.getElementById('inputRdfCurah').value = prod.rdfCurah;
+                document.getElementById('inputIndocement').value = prod.indocement;
+                document.getElementById('inputResidu').value = prod.residu;
+                document.getElementById('btnSubmitProduk').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Update Data';
+                document.getElementById('btnCancelProduk').classList.remove('hidden');
+            } else {
+                document.getElementById('editProdukId').value = "";
+                document.getElementById('inputRdfCurah').value = '';
+                document.getElementById('inputIndocement').value = '';
+                document.getElementById('inputResidu').value = '';
+                document.getElementById('btnSubmitProduk').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Data';
+                document.getElementById('btnCancelProduk').classList.add('hidden');
+            }
+            updateRdfPreview();
         }
 
         function setupProdukFormListeners() {
@@ -708,156 +1327,198 @@
         function updateRdfPreview() {
             const curah = parseFloat(document.getElementById('inputRdfCurah').value) || 0;
             const indo = parseFloat(document.getElementById('inputIndocement').value) || 0;
-            const totalRdf = curah + indo;
-            document.getElementById('previewTotalRdf').textContent = `${totalRdf.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} Ton`;
+            document.getElementById('previewTotalRdf').textContent = `${(curah + indo).toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} Ton`;
         }
 
-        function getFilteredData() {
-            const startMonth = document.getElementById('filterStartMonth').value;
-            const endMonth = document.getElementById('filterEndMonth').value;
+        // --- SUBMIT SAMPAH ---
+        function handleSampahFormSubmit(event) {
+            event.preventDefault();
+            const editId = document.getElementById('editSampahId').value;
+            const bIdx = document.getElementById('inputBulanSampah').value;
+            const y = document.getElementById('inputTahunSampah').value;
+            const periode = makeMonthKey(bIdx, y);
 
-            const filteredSampah = dataSampah.filter(item => {
-                const itemMonth = item.tanggal.substring(0, 7); // Ambil format YYYY-MM
-                if (startMonth && itemMonth < startMonth) return false;
-                if (endMonth && itemMonth > endMonth) return false;
-                return true;
-            });
+            const wilayah = document.getElementById('selectWilayah').value;
+            const kecamatan = document.getElementById('selectKecamatan').value;
+            const tonaseMasuk = parseFloat(document.getElementById('inputTonaseMasuk').value) || 0;
 
-            const filteredProduk = dataProduk.filter(item => {
-                const itemMonth = item.tanggal.substring(0, 7); // Ambil format YYYY-MM
-                if (startMonth && itemMonth < startMonth) return false;
-                if (endMonth && itemMonth > endMonth) return false;
-                return true;
-            });
-
-            return { filteredSampah, filteredProduk };
-        }
-
-        function applyDateFilter() {
+            if (editId) {
+                const idx = dataSampah.findIndex(d => d.id === editId);
+                if (idx !== -1) dataSampah[idx] = { id: editId, periode, wilayah, kecamatan, tonaseMasuk };
+            } else {
+                dataSampah.push({ id: Date.now().toString(), periode, wilayah, kecamatan, tonaseMasuk });
+            }
+            saveData();
+            cancelEditSampah();
             refreshDashboard();
+            showActionFeedback('sampahForm', 'Disimpan');
         }
 
-        function resetDateFilter() {
-            document.getElementById('filterStartMonth').value = '';
-            document.getElementById('filterEndMonth').value = '';
+        function editSampahRow(id) {
+            const item = dataSampah.find(d => d.id === id);
+            if (!item) return;
+
+            const parts = item.periode.split('-');
+            if (parts.length === 2) {
+                document.getElementById('inputTahunSampah').value = parts[0];
+                document.getElementById('inputBulanSampah').value = parseInt(parts[1], 10) - 1;
+            }
+
+            document.getElementById('editSampahId').value = item.id;
+            document.getElementById('selectWilayah').value = item.wilayah;
+            updateKecamatanDropdown();
+            document.getElementById('selectKecamatan').value = item.kecamatan;
+            document.getElementById('inputTonaseMasuk').value = item.tonaseMasuk;
+
+            document.getElementById('btnSubmitSampah').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Update Data';
+            document.getElementById('btnCancelSampah').classList.remove('hidden');
+            document.getElementById('sampahForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function cancelEditSampah() {
+            document.getElementById('editSampahId').value = "";
+            document.getElementById('sampahForm').reset();
+            document.getElementById('inputBulanSampah').value = CURRENT_MONTH_IDX;
+            document.getElementById('inputTahunSampah').value = CURRENT_YEAR;
+            updateKecamatanDropdown();
+            document.getElementById('btnSubmitSampah').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Tonase';
+            document.getElementById('btnCancelSampah').classList.add('hidden');
+        }
+
+        function deleteSampahRow(id) {
+            showModal("Hapus Log Entry", "Apakah Anda yakin ingin menghapus data tonase bulan ini?", function() {
+                dataSampah = dataSampah.filter(d => d.id !== id);
+                saveData();
+                refreshDashboard();
+            });
+        }
+
+        // --- SUBMIT PENGOLAHAN ---
+        function handleProdukFormSubmit(event) {
+            event.preventDefault();
+            const editId = document.getElementById('editProdukId').value;
+            const bIdx = document.getElementById('inputBulanProduk').value;
+            const y = document.getElementById('inputTahunProduk').value;
+            const periode = makeMonthKey(bIdx, y);
+
+            const rdfCurah = parseFloat(document.getElementById('inputRdfCurah').value) || 0;
+            const indocement = parseFloat(document.getElementById('inputIndocement').value) || 0;
+            const residu = parseFloat(document.getElementById('inputResidu').value) || 0;
+
+            if (editId) {
+                const idx = dataProduk.findIndex(d => d.id === editId);
+                if (idx !== -1) dataProduk[idx] = { id: editId, periode, rdfCurah, indocement, residu };
+            } else {
+                const existingIdx = dataProduk.findIndex(p => p.periode === periode);
+                if(existingIdx !== -1) {
+                    dataProduk[existingIdx] = { id: dataProduk[existingIdx].id, periode, rdfCurah, indocement, residu };
+                } else {
+                    dataProduk.push({ id: Date.now().toString(), periode, rdfCurah, indocement, residu });
+                }
+            }
+            saveData();
             refreshDashboard();
+            loadSelectedProdukMonthData();
+            showActionFeedback('produkForm', 'Berhasil Disimpan');
         }
 
-        function calculateSummary() {
-            const { filteredSampah, filteredProduk } = getFilteredData();
-
-            const summaryByWilayah = {};
-            const summaryByKecamatan = {};
-
-            Object.keys(MASTER_WILAYAH).forEach(w => {
-                summaryByWilayah[w] = { tonaseMasuk: 0, count: 0 };
-                MASTER_WILAYAH[w].forEach(k => {
-                    summaryByKecamatan[k] = 0;
-                });
-            });
-
-            let grandTotalSampah = 0;
-            filteredSampah.forEach(item => {
-                const w = item.wilayah;
-                const k = item.kecamatan;
-                const tonase = item.tonaseMasuk || 0;
-
-                if (!summaryByWilayah[w]) summaryByWilayah[w] = { tonaseMasuk: 0, count: 0 };
-                summaryByWilayah[w].tonaseMasuk += tonase;
-                summaryByWilayah[w].count += 1;
-
-                if (summaryByKecamatan[k] === undefined) summaryByKecamatan[k] = 0;
-                summaryByKecamatan[k] += tonase;
-
-                grandTotalSampah += tonase;
-            });
-
-            let sumRdfCurah = 0, sumIndocement = 0, sumResidu = 0;
-            filteredProduk.forEach(p => {
-                sumRdfCurah += p.rdfCurah || 0;
-                sumIndocement += p.indocement || 0;
-                sumResidu += p.residu || 0;
-            });
-
-            const rdfTerkirim = sumRdfCurah + sumIndocement;
-            const totalTerolah = rdfTerkirim + sumResidu;
-            const rasioTerolah = grandTotalSampah > 0 ? ((totalTerolah / grandTotalSampah) * 100).toFixed(1) : 0;
-
-            return {
-                summaryByWilayah,
-                summaryByKecamatan,
-                grandTotalSampah,
-                sumRdfCurah,
-                sumIndocement,
-                sumResidu,
-                rdfTerkirim,
-                totalTerolah,
-                rasioTerolah
-            };
+        function editProdukRow(id) {
+            const item = dataProduk.find(d => d.id === id);
+            if (!item) return;
+            const parts = item.periode.split('-');
+            if (parts.length === 2) {
+                document.getElementById('inputTahunProduk').value = parts[0];
+                document.getElementById('inputBulanProduk').value = parseInt(parts[1], 10) - 1;
+            }
+            loadSelectedProdukMonthData();
+            document.getElementById('produkForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function refreshDashboard() {
-            const stats = calculateSummary();
-
-            document.getElementById('stat-total-sampah').innerHTML = `${stats.grandTotalSampah.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-sm font-normal text-gray-400">Ton</span>`;
-            document.getElementById('stat-total-rdf').innerHTML = `${stats.rdfTerkirim.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-sm font-normal text-gray-400">Ton</span>`;
-            document.getElementById('stat-total-residu').innerHTML = `${stats.sumResidu.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-sm font-normal text-gray-400">Ton</span>`;
-            document.getElementById('stat-total-terolah').innerHTML = `${stats.totalTerolah.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} <span class="text-sm font-normal text-gray-400">Ton</span>`;
-            document.getElementById('stat-rasio-terolah').innerHTML = `<i class="fa-solid fa-percent text-emerald-400"></i> Efisiensi Terolah: <span class="text-emerald-400 font-bold">${stats.rasioTerolah}%</span> dari Sampah Masuk`;
-
-            renderWilayahCards(stats.summaryByWilayah, stats.summaryByKecamatan, stats.grandTotalSampah);
-            renderTable();
-
-            drawBarChart2D(stats.summaryByWilayah, stats.grandTotalSampah);
-            drawDonutChart2D(stats.sumRdfCurah, stats.sumIndocement, stats.sumResidu, stats.totalTerolah);
+        function cancelEditProduk() {
+            document.getElementById('inputBulanProduk').value = CURRENT_MONTH_IDX;
+            document.getElementById('inputTahunProduk').value = CURRENT_YEAR;
+            loadSelectedProdukMonthData();
         }
 
-        function renderWilayahCards(summaryMap, kecamatanMap, grandTotal) {
-            const container = document.getElementById('wilayah-cards-container');
-            container.innerHTML = '';
-
-            Object.keys(MASTER_WILAYAH).forEach(w => {
-                const dataWilayah = summaryMap[w] || { tonaseMasuk: 0, count: 0 };
-                const kontribusi = grandTotal > 0 ? ((dataWilayah.tonaseMasuk / grandTotal) * 100).toFixed(1) : 0;
-                const kecamatanList = MASTER_WILAYAH[w] || [];
-
-                let kecamatanListHtml = '';
-                kecamatanList.forEach(kec => {
-                    const tonaseKec = kecamatanMap[kec] || 0;
-                    const porsiKec = dataWilayah.tonaseMasuk > 0 ? ((tonaseKec / dataWilayah.tonaseMasuk) * 100) : 0;
-                    const displayName = kec.endsWith("Direct") ? "Input Langsung" : kec;
-
-                    kecamatanListHtml += `
-                        <div class="space-y-1">
-                            <div class="flex justify-between items-center text-xs">
-                                <span class="text-gray-400">${displayName}</span>
-                                <span class="font-bold">${tonaseKec.toLocaleString('id-ID', {maximumFractionDigits:1})} Ton</span>
-                            </div>
-                            <div class="w-full h-1 bg-gray-700/30 rounded-full overflow-hidden">
-                                <div class="h-full bg-indigo-500" style="width: ${Math.min(porsiKec, 100)}%"></div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                const cardHtml = `
-                    <div class="glass-card-3d p-5 flex flex-col justify-between h-full border-none">
-                        <div>
-                            <div class="flex items-center justify-between border-b border-gray-700/30 pb-3 mb-3">
-                                <h3 class="font-bold text-sm text-gray-800 dark:text-white">${w}</h3>
-                                <div class="text-right">
-                                    <div class="text-base font-extrabold text-indigo-500 dark:text-indigo-400">${dataWilayah.tonaseMasuk.toLocaleString('id-ID', {maximumFractionDigits:1})} Ton</div>
-                                    <div class="text-[10px] text-gray-500 dark:text-gray-400">${kontribusi}% dari Total</div>
-                                </div>
-                            </div>
-                            <div class="space-y-3 pt-1">
-                                ${kecamatanListHtml}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += cardHtml;
+        function deleteProdukRow(id) {
+            showModal("Hapus Log Hasil Pengolahan", "Apakah Anda yakin ingin menghapus data pengolahan bulan ini?", function() {
+                dataProduk = dataProduk.filter(d => d.id !== id);
+                saveData();
+                refreshDashboard();
+                loadSelectedProdukMonthData();
             });
+        }
+
+        // --- SUBMIT LAINNYA ---
+        function handleLainnyaFormSubmit(event) {
+            event.preventDefault();
+            const editId = document.getElementById('editLainnyaId').value;
+            const bIdx = document.getElementById('inputBulanLainnya').value;
+            const y = document.getElementById('inputTahunLainnya').value;
+            const periode = makeMonthKey(bIdx, y);
+            const jenisProduk = document.getElementById('inputJenisProdukLainnya').value;
+            const tonase = parseFloat(document.getElementById('inputTonaseLainnya').value) || 0;
+            const ritase = parseInt(document.getElementById('inputRitaseLainnya').value, 10) || 0;
+
+            if (editId) {
+                const idx = dataLainnya.findIndex(d => d.id === editId);
+                if (idx !== -1) dataLainnya[idx] = { id: editId, periode, jenisProduk, tonase, ritase };
+            } else {
+                dataLainnya.push({ id: Date.now().toString(), periode, jenisProduk, tonase, ritase });
+            }
+            saveData();
+            cancelEditLainnya();
+            refreshDashboard();
+            showActionFeedback('lainnyaForm', 'Ditambahkan');
+        }
+
+        function editLainnyaRow(id) {
+            const item = dataLainnya.find(d => d.id === id);
+            if (!item) return;
+
+            const parts = item.periode.split('-');
+            if (parts.length === 2) {
+                document.getElementById('inputTahunLainnya').value = parts[0];
+                document.getElementById('inputBulanLainnya').value = parseInt(parts[1], 10) - 1;
+            }
+
+            document.getElementById('editLainnyaId').value = item.id;
+            document.getElementById('inputJenisProdukLainnya').value = item.jenisProduk;
+            document.getElementById('inputTonaseLainnya').value = item.tonase;
+            document.getElementById('inputRitaseLainnya').value = item.ritase;
+
+            document.getElementById('btnSubmitLainnya').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Update Data';
+            document.getElementById('btnCancelLainnya').classList.remove('hidden');
+            document.getElementById('lainnyaForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function cancelEditLainnya() {
+            document.getElementById('editLainnyaId').value = "";
+            document.getElementById('lainnyaForm').reset();
+            document.getElementById('inputBulanLainnya').value = CURRENT_MONTH_IDX;
+            document.getElementById('inputTahunLainnya').value = CURRENT_YEAR;
+            document.getElementById('btnSubmitLainnya').innerHTML = '<i class="fa-solid fa-plus"></i> Tambah Produk';
+            document.getElementById('btnCancelLainnya').classList.add('hidden');
+        }
+
+        function deleteLainnyaRow(id) {
+            showModal("Hapus Log Produk Lainnya", "Apakah Anda yakin ingin menghapus entri produk ini?", function() {
+                dataLainnya = dataLainnya.filter(d => d.id !== id);
+                saveData();
+                refreshDashboard();
+            });
+        }
+
+        function showActionFeedback(formId, message) {
+            const btn = document.querySelector(`#${formId} button[type="submit"]`);
+            if(!btn) return;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> ${message}`;
+            btn.classList.add('bg-emerald-600');
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.classList.remove('bg-emerald-600');
+            }, 2000);
         }
 
         function renderTable() {
@@ -866,29 +1527,45 @@
             tbody.innerHTML = '';
 
             const { filteredSampah } = getFilteredData();
+            filteredSampah.sort((a, b) => b.periode.localeCompare(a.periode));
+
             const searchedData = filteredSampah.filter(item => {
+                const monthLabel = formatMonthLabel(item.periode).toLowerCase();
                 return item.wilayah.toLowerCase().includes(searchQuery) ||
                        item.kecamatan.toLowerCase().includes(searchQuery) ||
-                       item.tanggal.includes(searchQuery);
+                       monthLabel.includes(searchQuery);
             });
 
-            document.getElementById('rowCount').textContent = `Showing ${searchedData.length} of ${dataSampah.length} total entries`;
+            document.getElementById('rowCount').textContent = `Showing ${searchedData.length} entries`;
+
+            if(searchedData.length === 0) {
+                 const tr = document.createElement('tr');
+                 tr.innerHTML = `<td colspan="5" class="p-4 text-center text-slate-400 font-bold text-xs italic">Belum ada catatan pada periode ini.</td>`;
+                 tbody.appendChild(tr);
+                 return;
+            }
 
             searchedData.forEach((item) => {
                 const displayName = item.kecamatan.endsWith("Direct") ? item.wilayah + " (Direct)" : item.kecamatan;
+                const colorTheme = WILAYAH_COLORS[item.wilayah] || WILAYAH_COLORS["UPST"];
+                const monthLabel = formatMonthLabel(item.periode);
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/40 transition border-b border-gray-800/40";
+                tr.className = `${colorTheme.rowBg} transition border-b border-slate-700`;
                 tr.innerHTML = `
-                    <td class="p-3 text-gray-500 dark:text-gray-300 font-mono text-[11px]">${item.tanggal}</td>
-                    <td class="p-3 font-semibold text-gray-900 dark:text-white">${item.wilayah}</td>
-                    <td class="p-3 text-gray-600 dark:text-gray-300">${displayName}</td>
-                    <td class="p-3 text-right font-extrabold text-indigo-600 dark:text-indigo-400">${item.tonaseMasuk.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    <td class="p-3 text-center space-x-2">
-                        <button onclick="editSampahRow('${item.id}')" class="p-1 px-2 rounded bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500 hover:text-white transition text-xs" title="Edit">
+                    <td class="p-3.5 text-white font-black text-xs pl-4">
+                        <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-600 text-indigo-300 font-mono text-xs">
+                            ${monthLabel}
+                        </span>
+                    </td>
+                    <td class="p-3.5 font-black ${colorTheme.twText}">${item.wilayah}</td>
+                    <td class="p-3.5 text-slate-100 dark:text-slate-100 font-bold">${displayName}</td>
+                    <td class="p-3.5 text-right font-black text-white dark:text-white text-sm">${item.tonaseMasuk.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    <td class="p-3.5 text-center space-x-2 no-export">
+                        <button onclick="editSampahRow('${item.id}')" class="p-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition text-xs font-black cursor-pointer shadow">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                        <button onclick="deleteSampahRow('${item.id}')" class="p-1 px-2 rounded bg-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500 hover:text-white transition text-xs" title="Hapus">
+                        <button onclick="deleteSampahRow('${item.id}')" class="p-1.5 px-3 rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition text-xs font-black cursor-pointer shadow">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
@@ -897,98 +1574,223 @@
             });
         }
 
-        function handleSampahFormSubmit(event) {
-            event.preventDefault();
+        function renderProdukTable() {
+            const tbody = document.getElementById('dataTableProdukBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
 
-            const editId = document.getElementById('editSampahId').value;
-            const tanggal = document.getElementById('inputTanggalSampah').value;
-            const wilayah = document.getElementById('selectWilayah').value;
-            const kecamatan = document.getElementById('selectKecamatan').value;
-            const tonaseMasuk = parseFloat(document.getElementById('inputTonaseMasuk').value) || 0;
+            const { filteredProduk } = getFilteredData();
+            filteredProduk.sort((a, b) => b.periode.localeCompare(a.periode));
 
-            if (editId) {
-                const idx = dataSampah.findIndex(d => d.id === editId);
-                if (idx !== -1) {
-                    dataSampah[idx] = { id: editId, tanggal, wilayah, kecamatan, tonaseMasuk };
-                }
-            } else {
-                dataSampah.push({
-                    id: Date.now().toString(),
-                    tanggal,
-                    wilayah,
-                    kecamatan,
-                    tonaseMasuk
+            document.getElementById('rowCountProduk').textContent = `Showing ${filteredProduk.length} entries`;
+
+            if(filteredProduk.length === 0) {
+                 const tr = document.createElement('tr');
+                 tr.innerHTML = `<td colspan="5" class="p-4 text-center text-slate-400 font-bold text-xs italic">Belum ada catatan hasil pengolahan pada periode ini.</td>`;
+                 tbody.appendChild(tr);
+                 return;
+            }
+
+            filteredProduk.forEach((item) => {
+                const monthLabel = formatMonthLabel(item.periode);
+                const tr = document.createElement('tr');
+                tr.className = `bg-emerald-950/20 border-b border-slate-700 transition hover:bg-emerald-900/30`;
+                tr.innerHTML = `
+                    <td class="p-3.5 text-white font-black text-xs pl-4">
+                        <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-emerald-500/50 text-emerald-300 font-mono text-xs">
+                            ${monthLabel}
+                        </span>
+                    </td>
+                    <td class="p-3.5 text-right font-black text-cyan-300 text-sm">${item.rdfCurah.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} T</td>
+                    <td class="p-3.5 text-right font-black text-indigo-300 text-sm">${item.indocement.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} T</td>
+                    <td class="p-3.5 text-right font-black text-amber-300 text-sm">${item.residu.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})} T</td>
+                    <td class="p-3.5 text-center space-x-2 no-export">
+                        <button onclick="editProdukRow('${item.id}')" class="p-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition text-xs font-black cursor-pointer shadow">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="deleteProdukRow('${item.id}')" class="p-1.5 px-3 rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition text-xs font-black cursor-pointer shadow">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderLainnyaTable() {
+            const tbody = document.getElementById('dataTableLainnyaBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            const { filteredLainnya } = getFilteredData();
+            filteredLainnya.sort((a, b) => b.periode.localeCompare(a.periode));
+
+            document.getElementById('rowCountLainnya').textContent = `Showing ${filteredLainnya.length} entries`;
+
+            if(filteredLainnya.length === 0) {
+                 const tr = document.createElement('tr');
+                 tr.innerHTML = `<td colspan="5" class="p-4 text-center text-slate-400 font-bold text-xs italic">Belum ada catatan produk lainnya pada periode ini.</td>`;
+                 tbody.appendChild(tr);
+                 return;
+            }
+
+            filteredLainnya.forEach((item) => {
+                const monthLabel = formatMonthLabel(item.periode);
+                const tr = document.createElement('tr');
+                tr.className = `bg-purple-950/20 border-b border-slate-700 transition hover:bg-purple-900/30`;
+                tr.innerHTML = `
+                    <td class="p-3.5 text-white font-black text-xs pl-4">
+                        <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-purple-500/50 text-purple-300 font-mono text-xs">
+                            ${monthLabel}
+                        </span>
+                    </td>
+                    <td class="p-3.5 font-black text-slate-100">${item.jenisProduk}</td>
+                    <td class="p-3.5 text-right font-black text-purple-300 text-sm">${item.tonase.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    <td class="p-3.5 text-right font-black text-slate-300">${item.ritase} Rit</td>
+                    <td class="p-3.5 text-center space-x-2 no-export">
+                        <button onclick="editLainnyaRow('${item.id}')" class="p-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition text-xs font-black cursor-pointer shadow">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="deleteLainnyaRow('${item.id}')" class="p-1.5 px-3 rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition text-xs font-black cursor-pointer shadow">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function exportTableToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const startBulan = document.getElementById('filterStartMonth').value;
+            const startTahun = document.getElementById('filterStartYear').value;
+            const endBulan = document.getElementById('filterEndMonth').value;
+            const endTahun = document.getElementById('filterEndYear').value;
+            const startLabel = formatMonthLabel(makeMonthKey(startBulan, startTahun));
+            const endLabel = formatMonthLabel(makeMonthKey(endBulan, endTahun));
+
+            doc.setFontSize(14);
+            doc.setTextColor(20, 20, 20);
+            doc.text("Laporan Monthly Executive RDF Plant Jakarta", 14, 15);
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Periode Evaluasi: ${startLabel} s/d ${endLabel}`, 14, 22);
+
+            // Export Sampah Masuk
+            const { filteredSampah, filteredProduk, filteredLainnya } = getFilteredData();
+            filteredSampah.sort((a, b) => a.periode.localeCompare(b.periode));
+
+            const tableRowsSampah = [];
+            let totalTonaseSampah = 0;
+            filteredSampah.forEach(item => {
+                const displayName = item.kecamatan.endsWith("Direct") ? item.wilayah + " (Direct)" : item.kecamatan;
+                tableRowsSampah.push([
+                    formatMonthLabel(item.periode), item.wilayah, displayName,
+                    item.tonaseMasuk.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})
+                ]);
+                totalTonaseSampah += item.tonaseMasuk;
+            });
+
+            doc.setFontSize(11);
+            doc.setTextColor(20, 20, 20);
+            doc.text("1. Data Sampah Masuk", 14, 32);
+
+            doc.autoTable({
+                startY: 35,
+                head: [['Periode Bulan', 'Wilayah Asal', 'Kecamatan / Sumber', 'Tonase Masuk (Ton)']],
+                body: tableRowsSampah,
+                theme: 'striped',
+                headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
+                columnStyles: { 0: { cellWidth: 35 }, 3: { halign: 'right', fontStyle: 'bold' } },
+                foot: [['', '', 'TOTAL AKUMULASI SAMPAH', totalTonaseSampah.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})]],
+                footStyles: { fillColor: [241, 245, 249], textColor: [15, 23, 42], fontStyle: 'bold', halign: 'right' }
+            });
+
+            // Export Hasil Pengolahan
+            let finalY = doc.lastAutoTable.finalY + 15;
+            
+            if (filteredProduk.length > 0) {
+                if (finalY > 250) { doc.addPage(); finalY = 20; }
+                
+                doc.setFontSize(11);
+                doc.setTextColor(20, 20, 20);
+                doc.text("2. Data Hasil Pengolahan", 14, finalY);
+
+                const tableRowsProduk = [];
+                let sumCurah = 0, sumIndo = 0, sumResidu = 0;
+                filteredProduk.sort((a, b) => a.periode.localeCompare(b.periode));
+                
+                filteredProduk.forEach(item => {
+                    tableRowsProduk.push([
+                        formatMonthLabel(item.periode), 
+                        item.rdfCurah.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2}), 
+                        item.indocement.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2}),
+                        item.residu.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})
+                    ]);
+                    sumCurah += item.rdfCurah;
+                    sumIndo += item.indocement;
+                    sumResidu += item.residu;
+                });
+
+                doc.autoTable({
+                    startY: finalY + 4,
+                    head: [['Periode Bulan', 'RDF Curah (Ton)', 'Indocement (Ton)', 'Residu (Ton)']],
+                    body: tableRowsProduk,
+                    theme: 'striped',
+                    headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
+                    columnStyles: { 0: { cellWidth: 35 }, 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } },
+                    foot: [['TOTAL PENGOLAHAN', 
+                        sumCurah.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2}), 
+                        sumIndo.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2}), 
+                        sumResidu.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})
+                    ]],
+                    footStyles: { fillColor: [240, 253, 244], textColor: [15, 23, 42], fontStyle: 'bold', halign: 'right' }
+                });
+                finalY = doc.lastAutoTable.finalY + 15;
+            }
+
+            // Export Produk Lainnya
+            if (filteredLainnya.length > 0) {
+                if (finalY > 250) { doc.addPage(); finalY = 20; }
+                
+                doc.setFontSize(11);
+                doc.setTextColor(20, 20, 20);
+                doc.text("3. Data Pengeluaran Produk Lainnya", 14, finalY);
+
+                const tableRowsLainnya = [];
+                let totalTonaseLainnya = 0, totalRitaseLainnya = 0;
+                filteredLainnya.sort((a, b) => a.periode.localeCompare(b.periode));
+                
+                filteredLainnya.forEach(item => {
+                    tableRowsLainnya.push([
+                        formatMonthLabel(item.periode), item.jenisProduk,
+                        item.tonase.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2}), item.ritase
+                    ]);
+                    totalTonaseLainnya += item.tonase;
+                    totalRitaseLainnya += item.ritase;
+                });
+
+                doc.autoTable({
+                    startY: finalY + 4,
+                    head: [['Periode Bulan', 'Jenis Produk', 'Tonase (Ton)', 'Ritase']],
+                    body: tableRowsLainnya,
+                    theme: 'striped',
+                    headStyles: { fillColor: [147, 51, 234], textColor: [255, 255, 255], fontStyle: 'bold' },
+                    columnStyles: { 0: { cellWidth: 35 }, 2: { halign: 'right', fontStyle: 'bold' }, 3: { halign: 'right' } },
+                    foot: [['', 'TOTAL AKUMULASI', totalTonaseLainnya.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2}), totalRitaseLainnya]],
+                    footStyles: { fillColor: [250, 245, 255], textColor: [15, 23, 42], fontStyle: 'bold', halign: 'right' }
                 });
             }
 
-            saveData();
-            cancelEditSampah();
-            refreshDashboard();
-        }
-
-        function editSampahRow(id) {
-            const item = dataSampah.find(d => d.id === id);
-            if (!item) return;
-
-            document.getElementById('editSampahId').value = item.id;
-            document.getElementById('inputTanggalSampah').value = item.tanggal;
-            document.getElementById('selectWilayah').value = item.wilayah;
-            updateKecamatanDropdown();
-            document.getElementById('selectKecamatan').value = item.kecamatan;
-            document.getElementById('inputTonaseMasuk').value = item.tonaseMasuk;
-
-            document.getElementById('btnSubmitSampah').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Update Tonase';
-            document.getElementById('btnCancelSampah').classList.remove('hidden');
-            
-            // Scroll to form
-            document.getElementById('sampahForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        function cancelEditSampah() {
-            document.getElementById('editSampahId').value = "";
-            document.getElementById('sampahForm').reset();
-            document.getElementById('inputTanggalSampah').value = getTodayString();
-            updateKecamatanDropdown();
-            document.getElementById('btnSubmitSampah').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Tonase';
-            document.getElementById('btnCancelSampah').classList.add('hidden');
-        }
-
-        function deleteSampahRow(id) {
-            showModal(
-                "Hapus Entry Tonase",
-                "Apakah Anda yakin ingin menghapus data tonase kecamatan ini?",
-                function() {
-                    dataSampah = dataSampah.filter(d => d.id !== id);
-                    saveData();
-                    refreshDashboard();
-                }
-            );
-        }
-
-        function handleProdukFormSubmit(event) {
-            event.preventDefault();
-
-            const tanggal = document.getElementById('inputTanggalProduk').value;
-            const rdfCurah = parseFloat(document.getElementById('inputRdfCurah').value) || 0;
-            const indocement = parseFloat(document.getElementById('inputIndocement').value) || 0;
-            const residu = parseFloat(document.getElementById('inputResidu').value) || 0;
-
-            const idx = dataProduk.findIndex(p => p.tanggal === tanggal);
-            if (idx !== -1) {
-                dataProduk[idx] = { id: dataProduk[idx].id, tanggal, rdfCurah, indocement, residu };
-            } else {
-                dataProduk.push({ id: Date.now().toString(), tanggal, rdfCurah, indocement, residu });
-            }
-
-            saveData();
-            refreshDashboard();
+            doc.save(`Monthly_Report_RDF_${makeMonthKey(CURRENT_MONTH_IDX, CURRENT_YEAR)}.pdf`);
         }
 
         function drawBarChart2D(summaryMap, grandTotal) {
             const canvas = document.getElementById('barChart2DCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
-
             const rect = canvas.parentElement.getBoundingClientRect();
             const dpr = window.devicePixelRatio || 1;
             canvas.width = rect.width * dpr;
@@ -997,21 +1799,23 @@
 
             const width = rect.width;
             const height = rect.height;
-
             ctx.clearRect(0, 0, width, height);
 
             const regions = Object.keys(MASTER_WILAYAH);
-            const shortNames = ["Jakut", "Jaktim", "Jakpus", "Jakbar", "Jaksel", "Kep. Seribu", "UPST"];
-            const colors = ["#3b82f6", "#8b5cf6", "#f59e0b", "#10b981", "#22c55e", "#14b8a6", "#6366f1"];
+            const shortNames = ["Jakut", "Jaktim", "Jakpus", "Jakbar", "Jaksel", "Kep.Seribu", "UPST"];
+            const colors = regions.map(r => WILAYAH_COLORS[r].hex);
 
             const values = regions.map(r => summaryMap[r] ? summaryMap[r].tonaseMasuk : 0);
             const maxVal = Math.max(...values, 10);
 
-            const padding = { top: 40, bottom: 40, left: 20, right: 20 };
+            const padding = { top: 40, bottom: 35, left: 15, right: 15 };
             const chartWidth = width - padding.left - padding.right;
             const chartHeight = height - padding.top - padding.bottom;
-            const barWidth = Math.min(chartWidth / regions.length * 0.6, 45);
+            const barWidth = Math.min(chartWidth / regions.length * 0.55, 42);
             const gap = chartWidth / regions.length;
+
+            const textPrimary = currentTheme === 'dark' ? '#ffffff' : '#0f172a';
+            const textMuted = currentTheme === 'dark' ? '#cbd5e1' : '#334155';
 
             regions.forEach((region, i) => {
                 const val = values[i];
@@ -1020,27 +1824,24 @@
                 const x = padding.left + (i * gap) + (gap - barWidth) / 2;
                 const y = padding.top + (chartHeight - barH);
 
-                ctx.fillStyle = colors[i % colors.length];
+                ctx.fillStyle = colors[i];
                 ctx.beginPath();
-                if (barH > 6) {
-                    ctx.roundRect(x, y, barWidth, barH, [6, 6, 0, 0]);
-                } else {
-                    ctx.rect(x, y, barWidth, Math.max(barH, 2));
-                }
+                if (barH > 6) ctx.roundRect(x, y, barWidth, barH, [8, 8, 0, 0]);
+                else ctx.rect(x, y, barWidth, Math.max(barH, 2));
                 ctx.fill();
 
-                ctx.fillStyle = currentTheme === 'dark' ? '#f8fafc' : '#0f172a';
-                ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = textPrimary;
+                ctx.font = '800 12px "Plus Jakarta Sans", sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(`${pct}%`, x + barWidth / 2, Math.max(y - 18, 15));
 
-                ctx.fillStyle = currentTheme === 'dark' ? '#94a3b8' : '#64748b';
-                ctx.font = '500 9px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = textMuted;
+                ctx.font = '700 10px "Plus Jakarta Sans", sans-serif';
                 ctx.fillText(`${val.toLocaleString('id-ID', {maximumFractionDigits:0})}T`, x + barWidth / 2, Math.max(y - 6, 26));
 
-                ctx.fillStyle = currentTheme === 'dark' ? '#cbd5e1' : '#334155';
-                ctx.font = '600 10px "Plus Jakarta Sans", sans-serif';
-                ctx.fillText(shortNames[i], x + barWidth / 2, height - 12);
+                ctx.fillStyle = textPrimary;
+                ctx.font = '800 11px "Plus Jakarta Sans", sans-serif';
+                ctx.fillText(shortNames[i], x + barWidth / 2, height - 10);
             });
         }
 
@@ -1048,7 +1849,6 @@
             const canvas = document.getElementById('donutChart2DCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
-
             const rect = canvas.parentElement.getBoundingClientRect();
             const dpr = window.devicePixelRatio || 1;
             canvas.width = rect.width * dpr;
@@ -1057,7 +1857,6 @@
 
             const width = rect.width;
             const height = rect.height;
-
             ctx.clearRect(0, 0, width, height);
 
             const slices = [
@@ -1070,17 +1869,20 @@
             const centerX = width / 2;
             const centerY = height / 2;
             const outerRadius = Math.min(width, height) / 2 - 25;
-            const innerRadius = outerRadius * 0.58;
+            const innerRadius = outerRadius * 0.6;
+
+            const textPrimary = currentTheme === 'dark' ? '#ffffff' : '#0f172a';
+            const textMuted = currentTheme === 'dark' ? '#cbd5e1' : '#334155';
 
             if (total === 0) {
-                ctx.strokeStyle = currentTheme === 'dark' ? '#334155' : '#e2e8f0';
+                ctx.strokeStyle = currentTheme === 'dark' ? '#334155' : '#cbd5e1';
                 ctx.lineWidth = outerRadius - innerRadius;
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, (outerRadius + innerRadius) / 2, 0, Math.PI * 2);
                 ctx.stroke();
 
-                ctx.fillStyle = currentTheme === 'dark' ? '#94a3b8' : '#64748b';
-                ctx.font = '600 11px "Plus Jakarta Sans", sans-serif';
+                ctx.fillStyle = textMuted;
+                ctx.font = '700 12px "Plus Jakarta Sans", sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText("Belum Ada Data", centerX, centerY);
@@ -1088,10 +1890,8 @@
             }
 
             let startAngle = -Math.PI / 2;
-
             slices.forEach((slice) => {
                 if (slice.value <= 0) return;
-
                 const sliceAngle = (slice.value / total) * Math.PI * 2;
                 const endAngle = startAngle + sliceAngle;
                 const pct = ((slice.value / total) * 100).toFixed(1);
@@ -1108,67 +1908,66 @@
                 const tx = centerX + Math.cos(midAngle) * textRadius;
                 const ty = centerY + Math.sin(midAngle) * textRadius;
 
-                if (sliceAngle > 0.2) {
+                if (sliceAngle > 0.25) {
                     ctx.fillStyle = '#ffffff';
-                    ctx.font = 'extrabold 11px "Plus Jakarta Sans", sans-serif';
+                    ctx.font = '900 12px "Plus Jakarta Sans", sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(`${pct}%`, tx, ty);
                 }
-
                 startAngle = endAngle;
             });
 
-            ctx.fillStyle = currentTheme === 'dark' ? '#ffffff' : '#0f172a';
-            ctx.font = 'extrabold 13px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = textPrimary;
+            ctx.font = '900 14px "Plus Jakarta Sans", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(`${totalTerolah.toLocaleString('id-ID', {maximumFractionDigits:0})} Ton`, centerX, centerY - 6);
-
-            ctx.fillStyle = currentTheme === 'dark' ? '#94a3b8' : '#64748b';
-            ctx.font = '600 9px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = textMuted;
+            ctx.font = '800 10px "Plus Jakarta Sans", sans-serif';
             ctx.fillText("TOTAL TEROLAH", centerX, centerY + 10);
         }
 
         function downloadDashboardImage() {
             const btn = document.getElementById('btnDownloadDashboard');
             const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Mengolah PNG...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Memproses...';
             btn.disabled = true;
 
-            const captureArea = document.getElementById('dashboardCaptureArea');
-
             setTimeout(() => {
-                html2canvas(captureArea, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    windowWidth: 1600,
-                    backgroundColor: currentTheme === 'dark' ? '#0f172a' : '#f8fafc',
-                    logging: false,
-                    ignoreElements: (element) => {
-                        return element.id === 'customModal' || element.classList.contains('no-export');
-                    }
+                html2canvas(document.getElementById('dashboardCaptureArea'), {
+                    scale: 2, useCORS: true, allowTaint: true, windowWidth: 1600,
+                    backgroundColor: currentTheme === 'dark' ? '#050811' : '#f1f5f9',
+                    ignoreElements: (el) => el.id === 'customModal' || el.classList.contains('no-export')
                 }).then(canvas => {
-                    const image = canvas.toDataURL('image/png');
                     const link = document.createElement('a');
-                    const dateStr = getTodayString();
-                    link.download = `Report_RDF_Jakarta_${dateStr}.png`;
-                    link.href = image;
+                    link.download = `Executive_RDF_Report_${makeMonthKey(CURRENT_MONTH_IDX, CURRENT_YEAR)}.png`;
+                    link.href = canvas.toDataURL('image/png');
                     link.click();
-
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> Berhasil!';
-                    setTimeout(() => {
-                        btn.innerHTML = originalHtml;
-                        btn.disabled = false;
-                    }, 2000);
-                }).catch(err => {
-                    console.error('Gagal mengunduh gambar:', err);
-                    btn.innerHTML = originalHtml;
-                    btn.disabled = false;
-                });
-            }, 200);
+                    setTimeout(() => { btn.innerHTML = originalHtml; btn.disabled = false; }, 2000);
+                }).catch(() => { btn.innerHTML = originalHtml; btn.disabled = false; });
+            }, 250);
         }
+    </script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+      import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDRYhjdzD6QrPHBTSoyKS7T9DqmON7lkK0",
+        authDomain: "dashboard-bc1d8.firebaseapp.com",
+        databaseURL: "https://dashboard-bc1d8-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "dashboard-bc1d8",
+        storageBucket: "dashboard-bc1d8.firebasestorage.app",
+        messagingSenderId: "440275015159",
+        appId: "1:440275015159:web:c7dcb7c5139bae5b004af2"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+      window.db = db;
+      window.firebaseDatabase = { ref, onValue, set };
     </script>
 </body>
 </html>
