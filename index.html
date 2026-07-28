@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executive Dashboard Monitoring Tonase Sampah & Produk RDF DKI Jakarta</title>
+    <title>Dashboard Monthly Report Jembatan Timbang</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -243,7 +243,7 @@
             </div>
             
             <h2 class="text-2xl font-black text-white tracking-tight text-center mt-2">RDF Plant Jakarta</h2>
-            <p class="text-xs text-indigo-300 font-extrabold tracking-widest uppercase mb-6">Executive Reporting Portal</p>
+            <p class="text-xs text-indigo-300 font-extrabold tracking-widest uppercase mb-6">Reporting Portal</p>
             
             <form id="loginForm" class="w-full space-y-4" onsubmit="handleLogin(event)">
                 <div>
@@ -266,7 +266,7 @@
                 </div>
 
                 <button type="submit" id="loginBtn" class="w-full py-3.5 px-4 mt-2 rounded-xl btn-luxury-indigo font-black text-white text-xs tracking-wider uppercase flex justify-center items-center gap-2 cursor-pointer shadow-lg">
-                    <i class="fa-solid fa-right-to-bracket"></i> Masuk Executive Dashboard
+                    <i class="fa-solid fa-right-to-bracket"></i> Masuk Monthly Report Dashboard
                 </button>
             </form>
             
@@ -288,7 +288,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400 text-xs font-black text-indigo-300 uppercase tracking-widest">
-                            Monthly Executive Dashboard
+                            Monthly Report Dashboard
                         </span>
                     </div>
                     <h1 class="text-xl md:text-2xl font-black tracking-tight text-white dark:text-white mt-1">
@@ -883,7 +883,7 @@
                         dashboard.classList.add('flex');
                         refreshDashboard();
                         
-                        loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Masuk Executive Dashboard';
+                        loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Masuk Monthly Report Dashboard';
                         loginBtn.disabled = false;
                         document.getElementById('loginPassword').value = '';
                     }, 400);
@@ -894,7 +894,7 @@
         }
 
         function handleLogout() {
-            showModal("Konfirmasi Keluar", "Apakah Anda yakin ingin keluar dari executive dashboard?", function() {
+            showModal("Konfirmasi Keluar", "Apakah Anda yakin ingin keluar dari Monthly Report dashboard?", function() {
                 sessionStorage.removeItem('rdf_logged_in');
                 document.getElementById('loginUsername').value = '';
                 document.getElementById('loginPassword').value = '';
