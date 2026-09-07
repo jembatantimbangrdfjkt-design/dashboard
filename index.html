@@ -6,7 +6,7 @@
 <title>Surat Perintah Jalan RDF Jakarta</title>
 
 <!-- Menambahkan Favicon (Thumbnail Tab Browser) -->
-<link rel="icon" type="image/png" href="https://github.com/jembatantimbangrdfjkt-design/dashboard/blob/main/png/UPST.png?raw=true">
+<link rel="icon" type="image/png" href="/Users/user/Downloads/dasher-1.0.0/dasher-1.0.0/src/assets/images/png/UPST.png">
 
 <style>
 *{box-sizing:border-box}
@@ -459,6 +459,138 @@ th{height:26px}
   to{opacity:1}
 }
 
+/* ================= PANEL RIWAYAT (di dalam tab yang sama) ================= */
+.riwayat-overlay{
+  position:fixed;
+  inset:0;
+  z-index:5000;
+  background:rgba(2,6,23,.55);
+  backdrop-filter:blur(4px);
+  display:none;
+  align-items:flex-start;
+  justify-content:center;
+  padding:24px;
+  overflow-y:auto;
+}
+
+.riwayat-overlay.show{
+  display:flex;
+  animation:fadeIn .25s ease;
+}
+
+.riwayat-box{
+  width:100%;
+  max-width:1400px;
+  background:white;
+  border-radius:24px;
+  box-shadow:0 30px 80px rgba(0,0,0,.45);
+  padding:24px;
+  animation:popupScale .25s ease;
+}
+
+.riwayat-header{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  margin-bottom:18px;
+  flex-wrap:wrap;
+}
+
+.riwayat-logo{
+  width:64px;
+  height:64px;
+  object-fit:contain;
+  border-radius:10px;
+  box-shadow:0 6px 16px rgba(37,99,235,.25);
+}
+
+.riwayat-header h2{
+  margin:0;
+  color:#0f172a;
+  font-size:20px;
+}
+
+.riwayat-sub{
+  color:#475569;
+  font-size:13px;
+  margin-top:2px;
+}
+
+.riwayat-header-actions{
+  margin-left:auto;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.riwayat-table-wrap{
+  overflow:auto;
+  border-radius:14px;
+  border:1px solid #e2e8f0;
+}
+
+.riwayat-table-wrap table{
+  width:max-content;
+  min-width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  font-weight:normal;
+  white-space:nowrap;
+  table-layout:auto;
+}
+
+.riwayat-table-wrap th{
+  background:#1e3a8a;
+  color:white;
+  padding:10px 14px;
+  border:1px solid #1e40af;
+  position:sticky;
+  top:0;
+  height:auto;
+  vertical-align:middle;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.riwayat-table-wrap td{
+  padding:8px 14px;
+  border:1px solid #cbd5e1;
+  text-align:center;
+  vertical-align:middle;
+  height:auto;
+  white-space:nowrap;
+}
+
+.riwayat-table-wrap tr:nth-child(even){
+  background:#f8fafc;
+}
+
+.riwayat-badge{
+  padding:3px 8px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:bold;
+  color:white;
+}
+
+.riwayat-badge-produk{background:#2563eb;}
+.riwayat-badge-nonproduk{background:#06b6d4;}
+
+.riwayat-btn{
+  border:none;
+  padding:7px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  margin:2px;
+  color:white;
+  font-weight:bold;
+  font-size:12px;
+}
+
+.riwayat-btn-edit{background:#f59e0b}
+.riwayat-btn-print{background:#2563eb}
+.riwayat-btn-hapus{background:#ef4444}
+
 /* ================= PRINT KHUSUS BRUTTO / TARRE / NETTO ================= */
 .print-timbang-page{
   display:none;
@@ -467,12 +599,13 @@ th{height:26px}
 @media(max-width:900px){
   .toolbar{width:95%;}
   .form-grid-fix{grid-template-columns:1fr;}
+  .riwayat-header-actions{margin-left:0;}
 }
 
 @media print{
   body{background:white}
   body::before{display:none}
-  .toolbar, .rfid-popup, .modal-popup{display:none !important;}
+  .toolbar, .rfid-popup, .modal-popup, .riwayat-overlay{display:none !important;}
   .page{
     margin:0;
     width:210mm;
@@ -498,6 +631,7 @@ th{height:26px}
 
   body.print-timbang-active .toolbar,
   body.print-timbang-active .rfid-popup,
+  body.print-timbang-active .riwayat-overlay,
   body.print-timbang-active .print-timbang-page{
     display:none !important;
   }
@@ -848,6 +982,50 @@ th{height:26px}
   </div>
 </div>
 
+<!-- Panel Riwayat SPJ (di dalam tab yang sama, tidak buka tab baru) -->
+<div id="riwayatOverlay" class="riwayat-overlay">
+  <div class="riwayat-box">
+    <div class="riwayat-header">
+      <img src="png/Logo_DKI.jpg" class="riwayat-logo" alt="UPST">
+      <div>
+        <h2>Riwayat Data SPJ</h2>
+        <div class="riwayat-sub">RDF Plant Jakarta - Dinas Lingkungan Hidup DKI Jakarta</div>
+      </div>
+      <div class="riwayat-header-actions">
+        <button type="button" class="riwayat-btn riwayat-btn-print" onclick="window.print()">🖨 Cetak Riwayat</button>
+        <button type="button" class="popup-btn popup-btn-secondary" onclick="tutupRiwayat()">🏠 Kembali ke Beranda</button>
+      </div>
+    </div>
+
+    <div class="riwayat-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Tipe SPJ</th>
+            <th>Waktu Simpan</th>
+            <th>Tanggal SPJ</th>
+            <th>No Polisi</th>
+            <th>No Pintu</th>
+            <th>Jenis</th>
+            <th>Pengemudi</th>
+            <th>Ritasi</th>
+            <th>Lokasi / Tujuan</th>
+            <th>Brutto</th>
+            <th>Tarre</th>
+            <th>Netto</th>
+            <th>Keterangan / Uraian</th>
+            <th>Petugas</th>
+            <th>Mengetahui</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="riwayatTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <script>
 const DB_KEY = 'databaseSPJ_RDF_Jakarta';
 let editId = null;
@@ -1113,7 +1291,7 @@ mengetahuiSelect.addEventListener('change', function(){
   if(this.value.toUpperCase() === 'AHMAD RAFI'){
     ttdMengetahui.src = 'png/TTD AHMAD RAFI.png';
   }else{
-    ttdMengetahui.src = '/png/TTD RUFIDI.png';
+    ttdMengetahui.src = 'png/TTD RUFIDI.png';
   }
 });
 
@@ -1284,9 +1462,9 @@ function isiPreview(data){
     data.mengetahui || 'Rufidi C';
 
   if((data.mengetahui || '').toUpperCase() === 'AHMAD RAFI'){
-    document.getElementById('ttdMengetahui').src = '/png/TTD AHMAD RAFI.png';
+    document.getElementById('ttdMengetahui').src = '/Users/user/Downloads/dasher-1.0.0/dasher-1.0.0/src/assets/images/png/TTD AHMAD RAFI.png';
   }else{
-    document.getElementById('ttdMengetahui').src = '/png/TTD RUFIDI.png';
+    document.getElementById('ttdMengetahui').src = '/Users/user/Downloads/dasher-1.0.0/dasher-1.0.0/src/assets/images/png/TTD RUFIDI.png';
   }
 }
 
@@ -1399,18 +1577,28 @@ function printUlangSPJ(id){
 }
 
 function lihatRiwayat(){
+  renderRiwayatTable();
+  document.getElementById('riwayatOverlay').classList.add('show');
+}
+
+function tutupRiwayat(){
+  document.getElementById('riwayatOverlay').classList.remove('show');
+}
+
+function renderRiwayatTable(){
   const database = getDatabase();
+  const tbody = document.getElementById('riwayatTbody');
 
   if(database.length === 0){
-    showModal('Riwayat Kosong', 'Belum ada data SPJ yang tersimpan.', 'info');
+    tbody.innerHTML = '<tr><td colspan="17" style="padding:22px;text-align:center;">Belum ada data SPJ yang tersimpan.</td></tr>';
     return;
   }
 
-  const rows = database.map((d, i) => {
+  tbody.innerHTML = database.map((d, i) => {
     const isNonProduk = d.tipeSPJ === 'NON_PRODUK';
-    const badge = isNonProduk 
-      ? '<span style="background:#06b6d4;color:white;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:bold;">NON PRODUK</span>'
-      : '<span style="background:#2563eb;color:white;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:bold;">PRODUK</span>';
+    const badge = isNonProduk
+      ? '<span class="riwayat-badge riwayat-badge-nonproduk">NON PRODUK</span>'
+      : '<span class="riwayat-badge riwayat-badge-produk">PRODUK</span>';
 
     return `
     <tr>
@@ -1431,195 +1619,32 @@ function lihatRiwayat(){
       <td>${d.petugas || ''}</td>
       <td>${d.mengetahui || ''}</td>
       <td>
-        <button class="edit" onclick="editLocal('${d.id}')">✏️ Edit</button>
-        <button class="print" onclick="printLocal('${d.id}')">🖨 Print Ulang</button>
-        <button class="hapus" onclick="hapusLocal('${d.id}')">🗑 Hapus</button>
+        <button class="riwayat-btn riwayat-btn-edit" onclick="editRiwayat('${d.id}')">✏️ Edit</button>
+        <button class="riwayat-btn riwayat-btn-print" onclick="printRiwayat('${d.id}')">🖨 Print Ulang</button>
+        <button class="riwayat-btn riwayat-btn-hapus" onclick="hapusRiwayat('${d.id}')">🗑 Hapus</button>
       </td>
     </tr>
   `;
   }).join('');
+}
 
-  const halaman = window.open('', '_blank');
+function editRiwayat(id){
+  tutupRiwayat();
+  editSPJ(id);
+}
 
-  halaman.document.write(`
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Riwayat SPJ RDF Jakarta</title>
-  <style>
-    body{
-      font-family:Arial,Helvetica,sans-serif;
-      margin:0;
-      padding:25px;
-      background:linear-gradient(135deg,#020617,#1e3a8a,#2563eb);
-    }
+function printRiwayat(id){
+  tutupRiwayat();
+  printUlangSPJ(id);
+}
 
-    h2{
-      margin:0;
-      color:white;
-    }
-
-    .box{
-      background:white;
-      padding:20px;
-      border-radius:20px;
-      box-shadow:0 20px 50px rgba(0,0,0,.3);
-      overflow:auto;
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:12px;
-      white-space:nowrap;
-    }
-
-    th{
-      background:#1e3a8a;
-      color:white;
-      padding:10px;
-      border:1px solid #1e40af;
-    }
-
-    td{
-      padding:8px;
-      border:1px solid #cbd5e1;
-      text-align:center;
-    }
-
-    tr:nth-child(even){
-      background:#f8fafc;
-    }
-
-    button{
-      border:none;
-      padding:7px 10px;
-      border-radius:8px;
-      cursor:pointer;
-      margin:2px;
-      color:white;
-      font-weight:bold;
-    }
-
-    .edit{background:#f59e0b}
-    .print{background:#2563eb}
-    .hapus{background:#ef4444}
-    .btn-print{
-      background:#16a34a;
-      margin-bottom:15px;
-    }
-
-    .header-riwayat{
-      display:flex;
-      align-items:center;
-      gap:15px;
-      margin-bottom:20px;
-    }
-
-    .logo-riwayat{
-      width:85px;
-      height:85px;
-      object-fit:contain;
-      filter:
-        drop-shadow(0 0 8px rgba(255,255,255,.15))
-        drop-shadow(0 0 20px rgba(59,130,246,.25));
-    }
-
-    .sub-riwayat{
-      color:#dbeafe;
-      font-size:13px;
-      margin-top:4px;
-    }
-
-    @media print{
-      body{background:white;padding:0}
-      h2{color:black}
-      button{display:none}
-      .box{box-shadow:none;border-radius:0}
-    }
-  </style>
-</head>
-<body>
-
-  <div class="header-riwayat">
-      <img src="png/logo_RDF-.png" class="logo-riwayat">
-      <div>
-          <h2>Riwayat Data SPJ</h2>
-          <div class="sub-riwayat">
-              RDF Plant Jakarta - Dinas Lingkungan Hidup DKI Jakarta
-          </div>
-      </div>
-  </div>
-
-  <button class="btn-print" onclick="window.print()">🖨 Cetak Riwayat</button>
-
-  <div class="box">
-    <table>
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Tipe SPJ</th>
-          <th>Waktu Simpan</th>
-          <th>Tanggal SPJ</th>
-          <th>No Polisi</th>
-          <th>No Pintu</th>
-          <th>Jenis</th>
-          <th>Pengemudi</th>
-          <th>Ritasi</th>
-          <th>Lokasi / Tujuan</th>
-          <th>Brutto</th>
-          <th>Tarre</th>
-          <th>Netto</th>
-          <th>Keterangan / Uraian</th>
-          <th>Petugas</th>
-          <th>Mengetahui</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows}
-      </tbody>
-    </table>
-  </div>
-
-  <script>
-    const DB_KEY = '${DB_KEY}';
-
-    function editLocal(id){
-      if(window.opener && !window.opener.closed){
-        window.opener.editSPJ(id);
-        window.opener.focus();
-      }else{
-        alert('Halaman utama tidak ditemukan.');
-      }
-    }
-
-    function printLocal(id){
-      if(window.opener && !window.opener.closed){
-        window.opener.printUlangSPJ(id);
-        window.opener.focus();
-      }else{
-        alert('Halaman utama tidak ditemukan.');
-      }
-    }
-
-    function hapusLocal(id){
-      if(!confirm('Hapus data ini dari riwayat?')) return;
-
-      const database = JSON.parse(localStorage.getItem(DB_KEY)) || [];
-      const baru = database.filter(item => item.id !== id);
-
-      localStorage.setItem(DB_KEY, JSON.stringify(baru));
-      location.reload();
-    }
-  <\/script>
-
-</body>
-</html>
-  `);
-
-  halaman.document.close();
+function hapusRiwayat(id){
+  showModal('Hapus Data', 'Yakin ingin menghapus data SPJ ini dari riwayat? Tindakan ini tidak bisa dibatalkan.', 'danger', () => {
+    const database = getDatabase().filter(item => item.id !== id);
+    setDatabase(database);
+    renderRiwayatTable();
+    showModal('Berhasil Dihapus', 'Data SPJ berhasil dihapus dari riwayat.', 'success');
+  });
 }
 
 function resetForm(){
