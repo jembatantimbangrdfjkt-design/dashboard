@@ -1028,15 +1028,10 @@ th{height:26px}
   <p class="baller-help">Masukkan rincian setiap penimbangan. Form dimulai dengan 10 baris, tetapi jumlah baris dapat ditambah atau dikurangi sesuai kebutuhan.</p>
   <div class="baller-grid">
     <div><label for="ballerNoStruk">Nomor Struk</label><input id="ballerNoStruk" placeholder="Otomatis" readonly></div>
-    <div><label for="ballerTruck">No. Truk</label><input id="ballerTruck" placeholder="Contoh: B 9434 PJA"></div>
-    <div><label for="ballerPintu">No. Pintu</label><input id="ballerPintu" placeholder="Contoh: 1558 T"></div>
-    <div><label for="ballerPenugasan">Penugasan</label><input id="ballerPenugasan" value="Cakung (Jakarta Timur)"></div>
-    <div><label for="ballerProduk">Produk</label><input id="ballerProduk" value="Fresh Waste"></div>
+    <div><label for="ballerPenugasan">Sumber</label><input id="ballerPenugasan" value="Gudang Produk"></div>
+    <div><label for="ballerProduk">Produk</label><input id="ballerProduk" value="" placeholder="Ketik nama produk"></div>
     <div><label for="ballerPetugas">Petugas</label><input id="ballerPetugas" value="Ahmad Rafi"></div>
     <div><label for="ballerTanggal">Tanggal Struk</label><input id="ballerTanggal" type="date"></div>
-    <div><label for="ballerLineDefault">Line Default</label><input id="ballerLineDefault" value="Line 1"></div>
-    <div><label for="ballerBeratMasuk">Berat Masuk (KG)</label><input id="ballerBeratMasuk" type="number" min="0" step="0.01" placeholder="Opsional"></div>
-    <div><label for="ballerBeratKeluar">Berat Keluar (KG)</label><input id="ballerBeratKeluar" type="number" min="0" step="0.01" placeholder="Opsional"></div>
   </div>
   <div class="baller-section-title">Rincian Penimbangan Baller</div>
   <div id="ballerRows"></div>
@@ -2049,7 +2044,7 @@ function tambahBarisBaller(focus=true){
     <div class="row-field"><label>Tanggal</label><input class="baller-date" type="date" value="${tanggalISOHariIni()}" onchange="hitungTotalBaller()"></div>
     <div class="row-field"><label>Jam</label><input class="baller-time" type="time" step="1" value="${jamSekarang()}" onchange="hitungTotalBaller()"></div>
     <div class="row-field"><label>Netto (KG)</label><input class="baller-netto" type="number" min="0" step="0.01" placeholder="0" oninput="hitungTotalBaller()"></div>
-    <div class="row-field"><label>Line</label><input class="baller-line" value="${(document.getElementById('ballerLineDefault').value || 'Line 1').replace(/"/g,'&quot;')}"></div>
+    <div class="row-field"><label>Line</label><input class="baller-line" value="" placeholder="Line"></div>
     <button type="button" onclick="hapusBarisBaller(this)">Hapus</button>
   `;
   wrap.appendChild(row);
@@ -2099,13 +2094,9 @@ function simpanDanCetakBaller(){
   const data = {
     noStruk,
     tanggal: document.getElementById('ballerTanggal').value || tanggalISOHariIni(),
-    truk: document.getElementById('ballerTruck').value.trim(),
-    pintu: document.getElementById('ballerPintu').value.trim(),
     penugasan: document.getElementById('ballerPenugasan').value.trim(),
     produk: document.getElementById('ballerProduk').value.trim(),
     petugas: document.getElementById('ballerPetugas').value.trim(),
-    beratMasuk: document.getElementById('ballerBeratMasuk').value,
-    beratKeluar: document.getElementById('ballerBeratKeluar').value,
     detail, total, jumlah: detail.length,
     waktuSimpan: new Date().toISOString()
   };
@@ -2130,13 +2121,10 @@ function cetakStrukBaller(data){
   const rows = data.detail.map((item,i)=>`
     <tr>
       <td class="center">${i+1}</td>
-      <td>${item.tanggal || '-'}</td>
       <td>${item.jam || '-'}</td>
       <td class="right">${formatAngkaBaller(item.netto)} KG</td>
       <td style="padding-left:7px">${escapeHtmlBaller(item.line || '-')}</td>
     </tr>`).join('');
-  const beratMasuk = data.beratMasuk ? formatAngkaBaller(data.beratMasuk)+' KG' : '-';
-  const beratKeluar = data.beratKeluar ? formatAngkaBaller(data.beratKeluar)+' KG' : '-';
   popup.document.open();
   popup.document.write(`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
     <title>Struk Penimbangan Baller ${escapeHtmlBaller(data.noStruk)}</title>
@@ -2167,21 +2155,17 @@ function cetakStrukBaller(data){
       <div class="center top">RDF Jakarta</div>
       <div class="dash"></div>
       <div class="meta">
-        <div>No Truk</div><div>:</div><div>${escapeHtmlBaller(data.truk || '-')}</div>
-        <div>No Pintu</div><div>:</div><div>${escapeHtmlBaller(data.pintu || '-')}</div>
-        <div>Penugasan</div><div>:</div><div>${escapeHtmlBaller(data.penugasan || '-')}</div>
-        <div>Produk</div><div>:</div><div>${escapeHtmlBaller(data.produk || '-')}</div>
+        <div>Sumber</div><div>:</div><div>${escapeHtmlBaller(data.penugasan || 'Gudang Produk')}</div>
+        <div>Produk</div><div>:</div><div>${escapeHtmlBaller(data.produk || '')}</div>
         <div>Tanggal</div><div>:</div><div>${escapeHtmlBaller(data.tanggal)}</div>
       </div>
       <div class="dash"></div>
       <div class="bold">RINCIAN PENIMBANGAN BALLER</div>
-      <table><thead><tr><th>No</th><th>Tanggal</th><th>Jam</th><th class="right">Netto</th><th style="padding-left:7px">Line</th></tr></thead>
+      <table><thead><tr><th>No</th><th>Jam</th><th class="right">Netto</th><th style="padding-left:7px">Line</th></tr></thead>
       <tbody>${rows}</tbody></table>
       <div class="dash"></div>
       <div class="meta">
         <div>Total Penimbangan</div><div>:</div><div>${data.jumlah} kali</div>
-        <div>Berat Masuk</div><div>:</div><div>${beratMasuk}</div>
-        <div>Berat Keluar</div><div>:</div><div>${beratKeluar}</div>
       </div>
       <div class="dash"></div>
       <div class="total">BERAT NETTO / TOTAL : ${formatAngkaBaller(data.total)} KG</div>
