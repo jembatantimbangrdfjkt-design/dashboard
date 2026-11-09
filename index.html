@@ -605,7 +605,7 @@ th{height:26px}
 @media print{
   body{background:white}
   body::before{display:none}
-  .toolbar, .rfid-popup, .modal-popup, .riwayat-overlay{display:none !important;}
+  .toolbar, .main-tabs, .baller-panel, .rfid-popup, .modal-popup, .riwayat-overlay{display:none !important;}
   .page{
     margin:0;
     width:210mm;
@@ -670,11 +670,71 @@ th{height:26px}
   }
 }
 
+
+
+.main-tabs{width:min(1100px,96%);margin:18px auto 12px;display:flex;gap:10px}
+.main-tab{flex:1;padding:14px 16px;border:1px solid rgba(147,197,253,.45);border-radius:10px;
+ background:#1e293b;color:#e2e8f0;font-weight:800;font-size:15px;cursor:pointer}
+.main-tab.active{background:linear-gradient(135deg,#1d4ed8,#0284c7);color:#fff;border-color:#60a5fa;
+ box-shadow:0 6px 18px rgba(37,99,235,.25)}
+
+/* ================= MODUL PENIMBANGAN BALLER ================= */
+.baller-panel{
+  width:210mm; max-width:96%; margin:20px auto 28px; padding:28px;
+  border-radius:30px; background:rgba(255,255,255,.12); color:#fff;
+  backdrop-filter:blur(22px) saturate(140%);
+  -webkit-backdrop-filter:blur(22px) saturate(140%);
+  border:1px solid rgba(255,255,255,.28);
+  box-shadow:0 30px 80px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.3);
+}
+.baller-panel h2{margin:0 0 6px;font-size:22px}
+.baller-help{color:rgba(255,255,255,.85);font-size:13px;margin:0 0 16px}
+.baller-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.baller-panel label{display:block;font-size:12px;font-weight:700;margin:0 0 5px;color:#fff}
+.baller-panel input,.baller-panel select{
+  width:100%;padding:14px 15px;border:1px solid rgba(255,255,255,.35);border-radius:15px;
+  background:rgba(255,255,255,.94);color:#0f172a;font-size:14px;min-width:0;
+  box-shadow:0 8px 18px rgba(15,23,42,.12);font-family:inherit;
+}
+.baller-panel input:focus,.baller-panel select:focus{
+  outline:none;box-shadow:0 0 0 4px rgba(96,165,250,.35),0 14px 28px rgba(37,99,235,.25);
+}
+.baller-section-title{font-weight:800;margin:20px 0 10px;color:#fff;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:9px}
+.baller-row{
+  display:grid;grid-template-columns:52px 1.25fr 1fr 1fr 1fr 82px;
+  gap:8px;align-items:end;padding:10px;margin-bottom:8px;
+  border:1px solid rgba(255,255,255,.18);border-radius:15px;background:rgba(255,255,255,.09)
+}
+.baller-row-no{font-weight:800;text-align:center;padding:12px 0;color:#fff}
+.baller-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
+.baller-actions button,.baller-row button{
+  border:0;border-radius:8px;padding:11px 15px;font-weight:700;cursor:pointer;color:#fff
+}
+.baller-add{background:#0d9488}.baller-print{background:#2563eb}
+.baller-row button{background:#dc2626;padding:10px}
+.baller-summary{margin-top:14px;padding:13px;border-radius:10px;background:#1e3a8a;color:#fff;display:flex;gap:25px;flex-wrap:wrap}
+.baller-summary strong{font-size:18px}
+.baller-row .row-field{min-width:0}
+@media(max-width:900px){
+  .baller-panel{width:95%;padding:20px;border-radius:22px}
+  .baller-grid{grid-template-columns:1fr 1fr}
+  .baller-row{grid-template-columns:35px 1fr 1fr}
+  .baller-row .row-field:nth-child(4),.baller-row .row-field:nth-child(5){grid-row:2}
+  .baller-row button{grid-column:3}
+}
+
 </style>
 </head>
 
 <body>
 
+
+<!-- NAVIGASI UTAMA: SPJ DAN BALLER -->
+<div class="main-tabs">
+  <button type="button" class="main-tab active" id="tabSPJ" onclick="switchMainTab('SPJ')">Surat Perintah Jalan</button>
+  <button type="button" class="main-tab" id="tabBaller" onclick="switchMainTab('BALLER')">Penimbangan Baller</button>
+</div>
+<div id="spjTabView">
 <div class="toolbar">
 
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:15px;">
@@ -787,6 +847,7 @@ th{height:26px}
   </div>
 
 </div>
+
 
 <div class="page" id="pageContainer">
 
@@ -959,6 +1020,35 @@ th{height:26px}
   </div>
 </div>
 
+
+</div>
+<!-- TAB KHUSUS PENIMBANGAN BALLER -->
+<section class="baller-panel" id="ballerTabView" style="display:none;">
+  <h2>Input Penimbangan Baller</h2>
+  <p class="baller-help">Masukkan rincian setiap penimbangan. Form dimulai dengan 10 baris, tetapi jumlah baris dapat ditambah atau dikurangi sesuai kebutuhan.</p>
+  <div class="baller-grid">
+    <div><label for="ballerNoStruk">Nomor Struk</label><input id="ballerNoStruk" placeholder="Otomatis" readonly></div>
+    <div><label for="ballerTruck">No. Truk</label><input id="ballerTruck" placeholder="Contoh: B 9434 PJA"></div>
+    <div><label for="ballerPintu">No. Pintu</label><input id="ballerPintu" placeholder="Contoh: 1558 T"></div>
+    <div><label for="ballerPenugasan">Penugasan</label><input id="ballerPenugasan" value="Cakung (Jakarta Timur)"></div>
+    <div><label for="ballerProduk">Produk</label><input id="ballerProduk" value="Fresh Waste"></div>
+    <div><label for="ballerPetugas">Petugas</label><input id="ballerPetugas" value="Ahmad Rafi"></div>
+    <div><label for="ballerTanggal">Tanggal Struk</label><input id="ballerTanggal" type="date"></div>
+    <div><label for="ballerLineDefault">Line Default</label><input id="ballerLineDefault" value="Line 1"></div>
+    <div><label for="ballerBeratMasuk">Berat Masuk (KG)</label><input id="ballerBeratMasuk" type="number" min="0" step="0.01" placeholder="Opsional"></div>
+    <div><label for="ballerBeratKeluar">Berat Keluar (KG)</label><input id="ballerBeratKeluar" type="number" min="0" step="0.01" placeholder="Opsional"></div>
+  </div>
+  <div class="baller-section-title">Rincian Penimbangan Baller</div>
+  <div id="ballerRows"></div>
+  <div class="baller-summary">
+    <div>Jumlah penimbangan: <strong id="ballerCount">0</strong></div>
+    <div>Total Netto: <strong id="ballerTotal">0 KG</strong></div>
+  </div>
+  <div class="baller-actions">
+    <button type="button" class="baller-add" onclick="tambahBarisBaller()">＋ Tambah Penimbangan</button>
+    <button type="button" class="baller-print" onclick="simpanDanCetakBaller()">Simpan & Cetak Struk Baller</button>
+  </div>
+</section>
 <!-- Modal Dialog replace alert / confirm -->
 <div id="customModal" class="modal-popup">
   <div class="modal-popup-box">
@@ -1913,9 +2003,203 @@ function tutupPopupRFID(){
   }
 }
 
+
+// ================= PENIMBANGAN BALLER & CETAK STRUK EPSON TM-U220D =================
+const BALLER_DB_KEY = 'databasePenimbanganBaller_RDF_Jakarta';
+const BALLER_COUNTER_KEY = 'nomorStrukBaller_RDF_Jakarta_v2';
+
+function tanggalISOHariIni(){
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0,10);
+}
+function jamSekarang(){
+  return new Date().toLocaleTimeString('en-GB', {hour12:false});
+}
+function ambilNomorStrukBaller(){
+  let next = Number(localStorage.getItem(BALLER_COUNTER_KEY) || 102);
+  return String(next).padStart(6,'0');
+}
+
+function switchMainTab(tab){
+  const spj = document.getElementById('spjTabView');
+  const baller = document.getElementById('ballerTabView');
+  const spjBtn = document.getElementById('tabSPJ');
+  const ballerBtn = document.getElementById('tabBaller');
+  const isBaller = tab === 'BALLER';
+  spj.style.display = isBaller ? 'none' : 'block';
+  baller.style.display = isBaller ? 'block' : 'none';
+  spjBtn.classList.toggle('active',!isBaller);
+  ballerBtn.classList.toggle('active',isBaller);
+}
+function initBaller(){
+  const dateInput = document.getElementById('ballerTanggal');
+  if(dateInput && !dateInput.value) dateInput.value = tanggalISOHariIni();
+  document.getElementById('ballerNoStruk').value = ambilNomorStrukBaller();
+  for(let i=0;i<10;i++) tambahBarisBaller(false);
+  hitungTotalBaller();
+}
+function tambahBarisBaller(focus=true){
+  const wrap = document.getElementById('ballerRows');
+  const index = wrap.children.length + 1;
+  const row = document.createElement('div');
+  row.className = 'baller-row';
+  row.innerHTML = `
+    <div class="baller-row-no">${index}</div>
+    <div class="row-field"><label>Tanggal</label><input class="baller-date" type="date" value="${tanggalISOHariIni()}" onchange="hitungTotalBaller()"></div>
+    <div class="row-field"><label>Jam</label><input class="baller-time" type="time" step="1" value="${jamSekarang()}" onchange="hitungTotalBaller()"></div>
+    <div class="row-field"><label>Netto (KG)</label><input class="baller-netto" type="number" min="0" step="0.01" placeholder="0" oninput="hitungTotalBaller()"></div>
+    <div class="row-field"><label>Line</label><input class="baller-line" value="${(document.getElementById('ballerLineDefault').value || 'Line 1').replace(/"/g,'&quot;')}"></div>
+    <button type="button" onclick="hapusBarisBaller(this)">Hapus</button>
+  `;
+  wrap.appendChild(row);
+  perbaruiNomorBarisBaller();
+  if(focus) row.querySelector('.baller-netto').focus();
+}
+function hapusBarisBaller(button){
+  const rows = document.getElementById('ballerRows');
+  if(rows.children.length <= 1){
+    showModal('Peringatan','Minimal harus tersedia satu baris penimbangan.','warning');
+    return;
+  }
+  button.closest('.baller-row').remove();
+  perbaruiNomorBarisBaller();
+  hitungTotalBaller();
+}
+function perbaruiNomorBarisBaller(){
+  document.querySelectorAll('#ballerRows .baller-row').forEach((row,i)=>{
+    row.querySelector('.baller-row-no').textContent = i+1;
+  });
+}
+function ambilRincianBaller(){
+  return Array.from(document.querySelectorAll('#ballerRows .baller-row')).map(row=>({
+    tanggal: row.querySelector('.baller-date').value,
+    jam: row.querySelector('.baller-time').value,
+    netto: Number(row.querySelector('.baller-netto').value || 0),
+    line: row.querySelector('.baller-line').value.trim()
+  })).filter(item=>item.netto > 0);
+}
+function formatAngkaBaller(value){
+  return Number(value || 0).toLocaleString('id-ID',{maximumFractionDigits:2});
+}
+function hitungTotalBaller(){
+  const detail = ambilRincianBaller();
+  const total = detail.reduce((sum,item)=>sum+item.netto,0);
+  document.getElementById('ballerCount').textContent = detail.length;
+  document.getElementById('ballerTotal').textContent = formatAngkaBaller(total)+' KG';
+  return {detail,total};
+}
+function simpanDanCetakBaller(){
+  const {detail,total} = hitungTotalBaller();
+  if(detail.length === 0){
+    showModal('Data Belum Lengkap','Isi minimal satu nilai Netto penimbangan lebih dari 0 KG sebelum mencetak.','warning');
+    return;
+  }
+  const noStruk = document.getElementById('ballerNoStruk').value || ambilNomorStrukBaller();
+  const data = {
+    noStruk,
+    tanggal: document.getElementById('ballerTanggal').value || tanggalISOHariIni(),
+    truk: document.getElementById('ballerTruck').value.trim(),
+    pintu: document.getElementById('ballerPintu').value.trim(),
+    penugasan: document.getElementById('ballerPenugasan').value.trim(),
+    produk: document.getElementById('ballerProduk').value.trim(),
+    petugas: document.getElementById('ballerPetugas').value.trim(),
+    beratMasuk: document.getElementById('ballerBeratMasuk').value,
+    beratKeluar: document.getElementById('ballerBeratKeluar').value,
+    detail, total, jumlah: detail.length,
+    waktuSimpan: new Date().toISOString()
+  };
+  try{
+    const history = JSON.parse(localStorage.getItem(BALLER_DB_KEY) || '[]');
+    history.unshift(data);
+    localStorage.setItem(BALLER_DB_KEY,JSON.stringify(history));
+    localStorage.setItem(BALLER_COUNTER_KEY,String(Number(noStruk)+1));
+    document.getElementById('ballerNoStruk').value = ambilNomorStrukBaller();
+    cetakStrukBaller(data);
+  }catch(error){
+    console.error(error);
+    showModal('Gagal Menyimpan','Penyimpanan browser gagal. Periksa ruang penyimpanan atau mode private browser.','danger');
+  }
+}
+function cetakStrukBaller(data){
+  const popup = window.open('','_blank','width=420,height=700');
+  if(!popup){
+    showModal('Pop-up Diblokir','Izinkan pop-up untuk situs ini, kemudian tekan tombol cetak kembali.','warning');
+    return;
+  }
+  const rows = data.detail.map((item,i)=>`
+    <tr>
+      <td class="center">${i+1}</td>
+      <td>${item.tanggal || '-'}</td>
+      <td>${item.jam || '-'}</td>
+      <td class="right">${formatAngkaBaller(item.netto)} KG</td>
+      <td style="padding-left:7px">${escapeHtmlBaller(item.line || '-')}</td>
+    </tr>`).join('');
+  const beratMasuk = data.beratMasuk ? formatAngkaBaller(data.beratMasuk)+' KG' : '-';
+  const beratKeluar = data.beratKeluar ? formatAngkaBaller(data.beratKeluar)+' KG' : '-';
+  popup.document.open();
+  popup.document.write(`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
+    <title>Struk Penimbangan Baller ${escapeHtmlBaller(data.noStruk)}</title>
+    <style>
+      @page{size:76mm auto;margin:2mm}
+      *{box-sizing:border-box}
+      html,body{width:72mm;margin:0;padding:0;background:#fff;color:#000}
+      body{font-family:"Courier New",monospace;font-size:10px;line-height:1.25}
+      .receipt{width:72mm;margin:0 auto}
+      .center{text-align:center}.right{text-align:right}
+      .bold{font-weight:bold}
+      .top{font-size:11px;line-height:1.35}
+      .title{font-size:11px;font-weight:bold;margin-top:5px}
+      .dash{border-top:1px dashed #000;margin:5px 0}
+      .meta{display:grid;grid-template-columns:25mm 3mm 1fr;gap:1px 0}
+      .meta div{overflow-wrap:anywhere}
+      table{width:100%;border-collapse:collapse;font-size:9px;margin-top:4px}
+      th{border-bottom:1px solid #000;text-align:left;padding:2px 1px} th:last-child,td:last-child{padding-left:7px}
+      td{padding:2px 1px;vertical-align:top}
+      .total{font-size:11px;font-weight:bold}
+      .sign{margin-top:16px;min-height:35px}
+      .small{font-size:9px}
+      @media screen{body{padding:4px}.receipt{border:1px dashed #aaa;padding:2mm}}
+    </style></head><body><main class="receipt">
+      \n      <div class="bold">No Struk : ${escapeHtmlBaller(data.noStruk)}</div>
+      <div class="center top" style="margin-top:8px">Struk Penimbangan Sampah</div>
+      <div class="center title">STRUK PENIMBANGAN (KELUAR)</div>
+      <div class="center top">RDF Jakarta</div>
+      <div class="dash"></div>
+      <div class="meta">
+        <div>No Truk</div><div>:</div><div>${escapeHtmlBaller(data.truk || '-')}</div>
+        <div>No Pintu</div><div>:</div><div>${escapeHtmlBaller(data.pintu || '-')}</div>
+        <div>Penugasan</div><div>:</div><div>${escapeHtmlBaller(data.penugasan || '-')}</div>
+        <div>Produk</div><div>:</div><div>${escapeHtmlBaller(data.produk || '-')}</div>
+        <div>Tanggal</div><div>:</div><div>${escapeHtmlBaller(data.tanggal)}</div>
+      </div>
+      <div class="dash"></div>
+      <div class="bold">RINCIAN PENIMBANGAN BALLER</div>
+      <table><thead><tr><th>No</th><th>Tanggal</th><th>Jam</th><th class="right">Netto</th><th style="padding-left:7px">Line</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+      <div class="dash"></div>
+      <div class="meta">
+        <div>Total Penimbangan</div><div>:</div><div>${data.jumlah} kali</div>
+        <div>Berat Masuk</div><div>:</div><div>${beratMasuk}</div>
+        <div>Berat Keluar</div><div>:</div><div>${beratKeluar}</div>
+      </div>
+      <div class="dash"></div>
+      <div class="total">BERAT NETTO / TOTAL : ${formatAngkaBaller(data.total)} KG</div>
+      <div class="sign">Paraf Petugas :<br><br><br>${escapeHtmlBaller(data.petugas || '')}</div>
+      <div class="dash"></div>
+      <div class="center small">RDF Jakarta - Struk Penimbangan Baller</div>
+    </main><script>window.onload=function(){setTimeout(function(){window.focus();window.print();},300)};<\/script>
+    </body></html>`);
+  popup.document.close();
+}
+function escapeHtmlBaller(value){
+  return String(value ?? '').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+
 // Window load event listener to initialize application state
 window.onload = function() {
   switchMode('PRODUK');
+  initBaller();
 };
 
 </script>
