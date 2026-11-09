@@ -2130,7 +2130,7 @@ function cetakStrukBaller(data){
   const rows = data.detail.map((item,i)=>`
     <tr>
       <td class="center">${i+1}</td>
-      <td>${item.tanggal || '-'}</td>
+      <td>${item.tanggal ? item.tanggal.slice(8,10)+'/'+item.tanggal.slice(5,7)+'/'+item.tanggal.slice(2,4) : '-'}</td>
       <td>${item.jam || '-'}</td>
       <td class="right">${formatAngkaBaller(item.netto)} KG</td>
       <td style="padding-left:7px">${escapeHtmlBaller(item.line || '-')}</td>
@@ -2141,25 +2141,25 @@ function cetakStrukBaller(data){
   popup.document.write(`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
     <title>Struk Penimbangan Baller ${escapeHtmlBaller(data.noStruk)}</title>
     <style>
-      @page{size:76mm auto;margin:2mm}
+      @page{size:76mm auto;margin:0}
       *{box-sizing:border-box}
-      html,body{width:72mm;margin:0;padding:0;background:#fff;color:#000}
-      body{font-family:"Courier New",monospace;font-size:10px;line-height:1.25}
-      .receipt{width:72mm;margin:0 auto}
+      html,body{width:76mm;margin:0;padding:0;background:#fff;color:#000}
+      body{font-family:"Courier New",monospace;font-size:9px;line-height:1.2}
+      .receipt{width:62mm;max-width:62mm;margin:0 auto;overflow:hidden}
       .center{text-align:center}.right{text-align:right}
       .bold{font-weight:bold}
-      .top{font-size:11px;line-height:1.35}
-      .title{font-size:11px;font-weight:bold;margin-top:5px}
+      .top{font-size:9px;line-height:1.25;overflow-wrap:anywhere}
+      .title{font-size:9px;font-weight:bold;margin-top:4px;overflow-wrap:anywhere}
       .dash{border-top:1px dashed #000;margin:5px 0}
-      .meta{display:grid;grid-template-columns:25mm 3mm 1fr;gap:1px 0}
+      .meta{display:grid;grid-template-columns:21mm 2.5mm 1fr;gap:1px 0;font-size:8px}
       .meta div{overflow-wrap:anywhere}
-      table{width:100%;border-collapse:collapse;font-size:9px;margin-top:4px}
-      th{border-bottom:1px solid #000;text-align:left;padding:2px 1px} th:last-child,td:last-child{padding-left:7px}
-      td{padding:2px 1px;vertical-align:top}
-      .total{font-size:11px;font-weight:bold}
+      table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:7.5px;margin-top:4px}
+      th{border-bottom:1px solid #000;text-align:left;padding:2px 0;white-space:nowrap} th:last-child,td:last-child{padding-left:2px}
+      td{padding:2px 0;vertical-align:top;overflow-wrap:anywhere}
+      .total{font-size:9px;font-weight:bold;white-space:normal;overflow-wrap:anywhere}
       .sign{margin-top:16px;min-height:35px}
-      .small{font-size:9px}
-      @media screen{body{padding:4px}.receipt{border:1px dashed #aaa;padding:2mm}}
+      .small{font-size:7.5px;overflow-wrap:anywhere}
+      @media screen{body{padding:4px}.receipt{border:1px dashed #aaa;padding:1mm}}
     </style></head><body><main class="receipt">
       \n      <div class="bold">No Struk : ${escapeHtmlBaller(data.noStruk)}</div>
       <div class="center top" style="margin-top:8px">Struk Penimbangan Sampah</div>
@@ -2175,7 +2175,7 @@ function cetakStrukBaller(data){
       </div>
       <div class="dash"></div>
       <div class="bold">RINCIAN PENIMBANGAN BALLER</div>
-      <table><thead><tr><th>No</th><th>Tanggal</th><th>Jam</th><th class="right">Netto</th><th style="padding-left:7px">Line</th></tr></thead>
+      <table><colgroup><col style="width:5mm"><col style="width:17mm"><col style="width:12mm"><col style="width:15mm"><col style="width:13mm"></colgroup><thead><tr><th>No</th><th>Tgl</th><th>Jam</th><th class="right">Netto</th><th>Line</th></tr></thead>
       <tbody>${rows}</tbody></table>
       <div class="dash"></div>
       <div class="meta">
@@ -2184,7 +2184,7 @@ function cetakStrukBaller(data){
         <div>Berat Keluar</div><div>:</div><div>${beratKeluar}</div>
       </div>
       <div class="dash"></div>
-      <div class="total">BERAT NETTO / TOTAL : ${formatAngkaBaller(data.total)} KG</div>
+      <div class="total">TOTAL NETTO : ${formatAngkaBaller(data.total)} KG</div>
       <div class="sign">Paraf Petugas :<br><br><br>${escapeHtmlBaller(data.petugas || '')}</div>
       <div class="dash"></div>
       <div class="center small">RDF Jakarta - Struk Penimbangan Baller</div>
