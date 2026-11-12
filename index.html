@@ -723,10 +723,68 @@ th{height:26px}
   .baller-row button{grid-column:3}
 }
 
+
+/* ===== AUTENTIKASI RFID KARYAWAN ===== */
+#rfidLoginOverlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#020617,#102b52,#1d4ed8);font-family:Arial,sans-serif}
+.rfid-auth-card{width:min(460px,100%);background:#fff;color:#0f172a;border-radius:22px;padding:30px;box-shadow:0 25px 70px rgba(0,0,0,.35)}
+.rfid-auth-logo{text-align:center;margin-bottom:22px}.rfid-auth-logo img{width:105px;max-height:75px;object-fit:contain}.rfid-auth-logo h2{margin:12px 0 4px;font-size:22px;color:#12366b}.rfid-auth-logo p{margin:0;color:#64748b;font-size:12px;letter-spacing:.7px}
+.rfid-auth-icon{width:78px;height:78px;border-radius:50%;margin:0 auto 16px;background:#eaf2ff;color:#1d4ed8;display:flex;align-items:center;justify-content:center;font-size:36px}
+.rfid-auth-card label{display:block;font-size:12px;font-weight:700;margin:12px 0 6px;color:#334155}
+.rfid-auth-card input{box-sizing:border-box;width:100%;padding:13px 14px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px;margin:0 0 10px}
+.rfid-auth-card input:focus{outline:2px solid #93c5fd;border-color:#2563eb}
+.rfid-auth-status{text-align:center;border-radius:9px;background:#f1f5f9;padding:11px;color:#475569;font-size:13px;margin:14px 0}
+.rfid-auth-status.ok{background:#dcfce7;color:#166534}.rfid-auth-status.bad{background:#fee2e2;color:#991b1b}
+.rfid-auth-btn{width:100%;border:0;border-radius:10px;padding:12px 15px;background:#1d4ed8;color:#fff;font-weight:700;cursor:pointer;margin:5px 0}
+.rfid-auth-btn.secondary{background:#e2e8f0;color:#1e293b}.rfid-auth-small{font-size:11px;color:#64748b;text-align:center;line-height:1.5;margin-top:12px}
+#employeeEnrollPanel{display:none;border-top:1px solid #e2e8f0;margin-top:18px;padding-top:16px}
+#employeeList{font-size:12px;color:#334155;margin-top:10px;max-height:130px;overflow:auto}
+.employee-row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid #e2e8f0}
+.employee-row button{border:0;background:#fee2e2;color:#991b1b;border-radius:6px;padding:4px 8px;cursor:pointer}
+#sessionBar{display:none;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px;margin:0 0 12px;background:#eaf2ff;border:1px solid #bfdbfe;border-radius:10px;color:#12366b;font-size:13px}
+#sessionBar button{border:0;border-radius:7px;background:#1d4ed8;color:#fff;padding:7px 12px;font-weight:700;cursor:pointer}
+
 </style>
 </head>
 
 <body>
+
+<!-- LOGIN RFID KARYAWAN: aplikasi terkunci sampai identitas tervalidasi -->
+<div id="rfidLoginOverlay">
+  <div class="rfid-auth-card">
+    <div class="rfid-auth-logo">
+      <img src="png/logo_RDF-.png" alt="Logo RDF Jakarta" onerror="this.style.display='none'">
+      <h2>RDF JAKARTA</h2>
+      <p>SISTEM SURAT PERINTAH JALAN</p>
+    </div>
+    <div class="rfid-auth-icon">▣</div>
+    <h3 style="text-align:center;margin:0 0 5px">Login Petugas</h3>
+    <p style="text-align:center;color:#64748b;font-size:13px;margin:0">Tempelkan ID Card RFID karyawan pada reader USB.</p>
+    <label for="rfidLoginInput">UID Kartu RFID</label>
+    <input id="rfidLoginInput" type="text" autocomplete="off" placeholder="Menunggu tap kartu RFID..." autofocus>
+    <div id="rfidLoginStatus" class="rfid-auth-status">Sistem siap. Silakan tap kartu.</div>
+    <button class="rfid-auth-btn" type="button" onclick="prosesLoginRFID()">LOGIN</button>
+    <button class="rfid-auth-btn secondary" type="button" onclick="bukaPanelEnroll()">Kelola / Daftarkan Karyawan</button>
+    <div id="employeeEnrollPanel">
+      <h3 style="margin:0 0 5px;font-size:16px">Pendaftaran Kartu Karyawan</h3>
+      <p style="font-size:11px;color:#64748b;margin:0 0 10px">Menu administrasi. Masukkan nama karyawan, lalu tap kartu pada kolom UID.</p>
+      <label for="employeeNameInput">Nama lengkap karyawan</label>
+      <input id="employeeNameInput" type="text" placeholder="Nama sesuai identitas karyawan">
+      <label for="employeeIdInput">ID Karyawan</label>
+      <input id="employeeIdInput" type="text" placeholder="Nomor ID / NIK internal">
+      <label for="employeeRfidInput">Tap kartu RFID karyawan</label>
+      <input id="employeeRfidInput" type="text" autocomplete="off" placeholder="Tap kartu di sini">
+      <button class="rfid-auth-btn" type="button" onclick="simpanKaryawanRFID()">Simpan Karyawan</button>
+      <div id="employeeList"></div>
+      <button class="rfid-auth-btn secondary" type="button" onclick="tutupPanelEnroll()">Tutup Pengelolaan</button>
+    </div>
+    <div class="rfid-auth-small">Gunakan kartu RFID karyawan yang telah terdaftar. Kartu yang tidak dikenali tidak dapat mengakses aplikasi.</div>
+  </div>
+</div>
+<div id="sessionBar">
+  <div>Login sebagai: <strong id="sessionEmployeeName">-</strong> <span id="sessionEmployeeId"></span></div>
+  <button type="button" onclick="logoutRFID()">Logout</button>
+</div>
+
 
 
 <!-- NAVIGASI UTAMA: SPJ DAN BALLER -->
@@ -826,7 +884,7 @@ th{height:26px}
       </div>
 
       <!-- Input Bersama Kanan -->
-      <input id="ttdPetugas" placeholder="Nama TTD Petugas">
+      <input id="ttdPetugas" placeholder="Nama Petugas (otomatis dari login RFID)" readonly>
 
       <select id="mengetahui">
         <option value="Rufidi C">Rufidi C</option>
@@ -1030,7 +1088,7 @@ th{height:26px}
     <div><label for="ballerNoStruk">Nomor Struk</label><input id="ballerNoStruk" placeholder="Otomatis" readonly></div>
     <div><label for="ballerPenugasan">Sumber</label><input id="ballerPenugasan" value="Gudang Produk"></div>
     <div><label for="ballerProduk">Produk</label><input id="ballerProduk" value="" placeholder="Ketik nama produk"></div>
-    <div><label for="ballerPetugas">Petugas</label><input id="ballerPetugas" value="Ahmad Rafi"></div>
+    <div><label for="ballerPetugas">Petugas</label><input id="ballerPetugas" value="" readonly placeholder="Otomatis dari login RFID"></div>
     <div><label for="ballerTanggal">Tanggal Struk</label><input id="ballerTanggal" type="date"></div>
   </div>
   <div class="baller-section-title">Rincian Penimbangan Baller</div>
@@ -1424,7 +1482,9 @@ function ambilDataSPJ(){
     keteranganNonProduk: document.getElementById('keteranganNonProduk').value,
     tujuanKetTambahanNonProduk: document.getElementById('tujuanKetTambahanNonProduk').value,
     ttdPengemudi: document.getElementById('ttdPengemudi').value,
-    petugas: document.getElementById('ttdPetugas').value,
+    petugas: (currentEmployee && currentEmployee.nama) || '',
+    petugasId: (currentEmployee && currentEmployee.idKaryawan) || '',
+    petugasRFID: (currentEmployee && currentEmployee.rfid) || '',
     mengetahui: document.getElementById('mengetahui').value
   };
 }
@@ -1451,6 +1511,7 @@ function validasiDataSPJ(){
 }
 
 function simpanDataSPJ(){
+  if(!currentEmployee){ return { success:false, message:'Sesi login tidak ditemukan. Silakan login menggunakan ID Card RFID.' }; }
   const pesanError = validasiDataSPJ();
   if(pesanError){
     return { success:false, message: pesanError };
@@ -1554,6 +1615,7 @@ function isiPreview(data){
 }
 
 function updateDataSPJ(){
+  if(!currentEmployee){ showModal('Akses Ditolak','Silakan login menggunakan ID Card RFID.','danger'); return; }
   if(!editId){
     showModal('Peringatan', 'Tidak ada data yang sedang diedit.', 'warning');
     return;
@@ -1578,6 +1640,8 @@ function updateDataSPJ(){
     dataBaru.id = editId;
     dataBaru.waktuSimpan = database[index].waktuSimpan;
     dataBaru.waktuUpdate = new Date().toLocaleString('id-ID');
+    dataBaru.diperbaruiOleh = currentEmployee.nama;
+    dataBaru.diperbaruiOlehId = currentEmployee.idKaryawan;
 
     database[index] = dataBaru;
     setDatabase(database);
@@ -1608,7 +1672,7 @@ function editSPJ(id){
 
   document.getElementById('tanggal').value = data.tanggalInput || '';
   document.getElementById('lokasi').value = data.lokasi || '';
-  document.getElementById('ttdPetugas').value = data.petugas || '';
+  document.getElementById('ttdPetugas').value = currentEmployee ? currentEmployee.nama : ''; 
   document.getElementById('mengetahui').value = data.mengetahui || 'Rufidi C';
 
   if (mode === 'PRODUK') {
@@ -1737,8 +1801,9 @@ function resetForm(){
   document.getElementById('btnUpdate').style.display = 'none';
 
   document.querySelectorAll('.toolbar input').forEach(input => {
-    input.value = '';
+    if(input.id !== 'ttdPetugas') input.value = '';
   });
+  if(currentEmployee) document.getElementById('ttdPetugas').value=currentEmployee.nama;
 
   document.querySelectorAll('.toolbar textarea').forEach(textarea => {
     textarea.value = '';
@@ -2085,6 +2150,8 @@ function hitungTotalBaller(){
   return {detail,total};
 }
 function simpanDanCetakBaller(){
+  if(!currentEmployee){ showModal('Akses Ditolak','Silakan login menggunakan ID Card RFID.','danger'); return; }
+  document.getElementById('ballerPetugas').value=currentEmployee.nama;
   const {detail,total} = hitungTotalBaller();
   if(detail.length === 0){
     showModal('Data Belum Lengkap','Isi minimal satu nilai Netto penimbangan lebih dari 0 KG sebelum mencetak.','warning');
@@ -2180,10 +2247,126 @@ function escapeHtmlBaller(value){
   return String(value ?? '').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 }
 
+
+// ===== AUTENTIKASI RFID KARYAWAN (USB KEYBOARD WEDGE) =====
+// Ganti PIN ini sebelum aplikasi dipakai. Penyimpanan localStorage cocok untuk prototipe satu browser,
+// bukan autentikasi produksi multi-komputer. Untuk produksi gunakan backend/database server.
+const EMPLOYEE_DB_KEY = 'databaseKaryawan_RDF';
+const EMPLOYEE_SESSION_KEY = 'sessionPetugasRDF';
+const ADMIN_ENROLL_PIN = '123456'; // WAJIB diganti oleh administrator
+let currentEmployee = null;
+
+function normalizeRFID(value){ return String(value || '').trim().replace(/\\s+/g,'').toUpperCase(); }
+function getEmployeeDatabase(){
+  try { return JSON.parse(localStorage.getItem(EMPLOYEE_DB_KEY)) || []; }
+  catch(e){ return []; }
+}
+function setEmployeeDatabase(data){ localStorage.setItem(EMPLOYEE_DB_KEY, JSON.stringify(data)); }
+function setLoginStatus(message,type=''){
+  const el=document.getElementById('rfidLoginStatus');
+  if(!el) return;
+  el.textContent=message;
+  el.className='rfid-auth-status'+(type?' '+type:'');
+}
+function prosesLoginRFID(){
+  const input=document.getElementById('rfidLoginInput');
+  const uid=normalizeRFID(input.value);
+  if(!uid){ setLoginStatus('UID kartu belum terbaca. Silakan tap ulang.','bad'); input.focus(); return; }
+  const employee=getEmployeeDatabase().find(x=>normalizeRFID(x.rfid)===uid && x.aktif!==false);
+  input.value='';
+  if(!employee){ setLoginStatus('Kartu RFID tidak terdaftar atau dinonaktifkan. Akses ditolak.','bad'); input.focus(); return; }
+  currentEmployee={idKaryawan:employee.idKaryawan||'',nama:employee.nama,rfid:employee.rfid};
+  sessionStorage.setItem(EMPLOYEE_SESSION_KEY,JSON.stringify(currentEmployee));
+  tampilkanAplikasiSetelahLogin();
+}
+function tampilkanAplikasiSetelahLogin(){
+  if(!currentEmployee) return;
+  document.getElementById('rfidLoginOverlay').style.display='none';
+  document.getElementById('sessionBar').style.display='flex';
+  document.getElementById('sessionEmployeeName').textContent=currentEmployee.nama;
+  document.getElementById('sessionEmployeeId').textContent=currentEmployee.idKaryawan ? ' | ID: '+currentEmployee.idKaryawan : '';
+  document.getElementById('ttdPetugas').value=currentEmployee.nama;
+  document.getElementById('ttdPetugas').readOnly=true;
+  const ballerPetugas=document.getElementById('ballerPetugas');
+  if(ballerPetugas){ ballerPetugas.value=currentEmployee.nama; ballerPetugas.readOnly=true; }
+  setLoginStatus('Login berhasil. Selamat bekerja, '+currentEmployee.nama+'.','ok');
+}
+function logoutRFID(){
+  currentEmployee=null;
+  sessionStorage.removeItem(EMPLOYEE_SESSION_KEY);
+  editId=null;
+  document.getElementById('btnUpdate').style.display='none';
+  document.getElementById('sessionBar').style.display='none';
+  document.getElementById('rfidLoginOverlay').style.display='flex';
+  document.getElementById('rfidLoginInput').value='';
+  document.getElementById('employeeEnrollPanel').style.display='none';
+  setLoginStatus('Anda telah logout. Tap ID Card untuk login kembali.');
+  setTimeout(()=>document.getElementById('rfidLoginInput').focus(),100);
+}
+function bukaPanelEnroll(){
+  const pin=prompt('Masukkan PIN administrator untuk mengelola data karyawan:');
+  if(pin!==ADMIN_ENROLL_PIN){ if(pin!==null) alert('PIN administrator salah.'); return; }
+  document.getElementById('employeeEnrollPanel').style.display='block';
+  renderDaftarKaryawan();
+  document.getElementById('employeeNameInput').focus();
+}
+function tutupPanelEnroll(){ document.getElementById('employeeEnrollPanel').style.display='none'; document.getElementById('rfidLoginInput').focus(); }
+function simpanKaryawanRFID(){
+  const nama=document.getElementById('employeeNameInput').value.trim();
+  const idKaryawan=document.getElementById('employeeIdInput').value.trim();
+  const rfid=normalizeRFID(document.getElementById('employeeRfidInput').value);
+  if(!nama || !rfid){ alert('Nama karyawan dan UID RFID wajib diisi.'); return; }
+  const db=getEmployeeDatabase();
+  const existing=db.find(x=>normalizeRFID(x.rfid)===rfid);
+  if(existing && !confirm('UID ini sudah terdaftar atas nama '+existing.nama+'. Ganti data karyawan tersebut?')) return;
+  const record={id:'KRY-'+Date.now(),idKaryawan,nama,rfid,aktif:true,dibuatPada:new Date().toISOString()};
+  const updated=db.filter(x=>normalizeRFID(x.rfid)!==rfid);
+  updated.push(record);
+  setEmployeeDatabase(updated);
+  document.getElementById('employeeNameInput').value='';
+  document.getElementById('employeeIdInput').value='';
+  document.getElementById('employeeRfidInput').value='';
+  renderDaftarKaryawan();
+  alert('Karyawan berhasil didaftarkan.');
+}
+function renderDaftarKaryawan(){
+  const wrap=document.getElementById('employeeList');
+  if(!wrap) return;
+  const db=getEmployeeDatabase();
+  if(!db.length){ wrap.textContent='Belum ada karyawan terdaftar.'; return; }
+  wrap.innerHTML='<strong>Daftar karyawan terdaftar</strong>'+db.map((x,i)=>`<div class="employee-row"><span>${i+1}. ${escapeHtmlAuth(x.nama)} (${escapeHtmlAuth(x.idKaryawan||'-')})</span><button type="button" onclick="hapusKaryawanRFID('${String(x.id).replace(/'/g,'')}')">Hapus</button></div>`).join('');
+}
+function escapeHtmlAuth(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function hapusKaryawanRFID(id){
+  const db=getEmployeeDatabase();
+  const target=db.find(x=>x.id===id);
+  if(!target || !confirm('Nonaktifkan/hapus kartu '+target.nama+'?')) return;
+  setEmployeeDatabase(db.filter(x=>x.id!==id));
+  renderDaftarKaryawan();
+}
+function initRFIDAuth(){
+  const saved=sessionStorage.getItem(EMPLOYEE_SESSION_KEY);
+  if(saved){
+    try{
+      const candidate=JSON.parse(saved);
+      const verified=getEmployeeDatabase().find(x=>normalizeRFID(x.rfid)===normalizeRFID(candidate.rfid) && x.aktif!==false);
+      if(verified){ currentEmployee={idKaryawan:verified.idKaryawan||'',nama:verified.nama,rfid:verified.rfid}; tampilkanAplikasiSetelahLogin(); }
+      else { sessionStorage.removeItem(EMPLOYEE_SESSION_KEY); }
+    }catch(e){ sessionStorage.removeItem(EMPLOYEE_SESSION_KEY); }
+  }
+  const loginInput=document.getElementById('rfidLoginInput');
+  const enrollInput=document.getElementById('employeeRfidInput');
+  // USB RFID reader umumnya bekerja sebagai keyboard: UID diketik lalu diakhiri tombol Enter.
+  loginInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();prosesLoginRFID();}});
+  enrollInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); document.getElementById('employeeNameInput').focus();}});
+  if(!currentEmployee) setTimeout(()=>loginInput.focus(),250);
+}
+
 // Window load event listener to initialize application state
 window.onload = function() {
   switchMode('PRODUK');
   initBaller();
+  initRFIDAuth();
 };
 
 </script>
