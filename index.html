@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -1447,6 +1448,11 @@ function setDatabase(database){
 }
 
 function updatePreviewLive() {
+  const namaPetugas = (currentEmployee && currentEmployee.nama) ||
+    document.getElementById('ttdPetugas').value.trim();
+  document.getElementById('pTtdPetugas').textContent =
+    namaPetugas || '(........................................)';
+
   const lokasiVal = document.getElementById('lokasi').value;
   document.getElementById('pLokasi').textContent = lokasiVal;
   document.getElementById('pLokasiNonProduk').textContent = lokasiVal || '............................';
@@ -1532,6 +1538,11 @@ function simpanDataSPJ(){
 }
 
 function simpanDanCetak(){
+  // Pastikan nama petugas pada lembar cetak mengikuti sesi RFID yang sedang aktif.
+  if(currentEmployee){
+    document.getElementById('pTtdPetugas').textContent = currentEmployee.nama;
+  }
+
   const hasil = simpanDataSPJ();
 
   if(!hasil.success){
@@ -2287,6 +2298,14 @@ function tampilkanAplikasiSetelahLogin(){
   document.getElementById('sessionEmployeeId').textContent=currentEmployee.idKaryawan ? ' | ID: '+currentEmployee.idKaryawan : '';
   document.getElementById('ttdPetugas').value=currentEmployee.nama;
   document.getElementById('ttdPetugas').readOnly=true;
+
+  // Sinkronkan nama petugas ke area tanda tangan dokumen cetak.
+  // Perubahan .value melalui JavaScript tidak memicu event input secara otomatis.
+  const cetakNamaPetugas=document.getElementById('pTtdPetugas');
+  if(cetakNamaPetugas){
+    cetakNamaPetugas.textContent=currentEmployee.nama || '(........................................)';
+  }
+
   const ballerPetugas=document.getElementById('ballerPetugas');
   if(ballerPetugas){ ballerPetugas.value=currentEmployee.nama; ballerPetugas.readOnly=true; }
   setLoginStatus('Login berhasil. Selamat bekerja, '+currentEmployee.nama+'.','ok');
